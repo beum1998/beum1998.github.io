@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Site</title>
+    <link rel="icon" type="image/png" href="./하마4.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:wght@400;500;600&family=Sora:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body class="test-site">
+    <div class="container container--full">
+        <section class="diff-layout" id="diff-screen">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h2>Past / Before</h2>
+                </div>
+                <div id="before-target" class="viewer-surface"></div>
+                <div class="panel-controls">
+                    <div class="control-row">
+                        <label class="control-label" for="before-slider">Revision</label>
+                        <button class="time-save" id="before-save" type="button">Save time</button>
+                    </div>
+                    <input type="range" id="before-slider" class="slider slider--before">
+                    <div class="saved-times" id="before-saved"></div>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h2>Current / After</h2>
+                    <div class="sync-toggle">
+                        <span class="sync-label">Sync camera</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sync-camera" checked>
+                            <span class="toggle-track"></span>
+                        </label>
+                    </div>
+                    <div class="sync-toggle">
+                        <span class="sync-label">Ghost others</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="isolate-ghost">
+                            <span class="toggle-track"></span>
+                        </label>
+                    </div>
+                </div>
+                <div id="after-target" class="viewer-surface"></div>
+                <div class="panel-controls">
+                    <div class="control-row">
+                        <label class="control-label" for="after-slider">Revision</label>
+                        <button class="time-save" id="after-save" type="button">Save time</button>
+                    </div>
+                    <input type="range" id="after-slider" class="slider slider--after">
+                    <div class="saved-times" id="after-saved"></div>
+                </div>
+            </div>
+
+            <div class="panel-card panel-card--right" id="llm-panel">
+                <div class="panel-header">
+                    <h2>Diff / Quantity & Log</h2>
+                    <div class="panel-meta">A vs B</div>
+                </div>
+                <div class="diff-summary diff-summary--standalone" id="diff-summary"></div>
+                <div class="llm-tab-row">
+                    <button class="llm-tab-button is-active" id="llm-tab-diff" type="button">Diff</button>
+                    <button class="llm-tab-button" id="llm-tab-chat" type="button">Chat</button>
+                </div>
+                <div class="llm-panel-content llm-panel-content--diff is-active" id="llm-panel-diff">
+                    <div class="diff-tabs">
+                        <button class="diff-tab is-active" type="button" data-diff-tab="summary">Summary</button>
+                        <button class="diff-tab" type="button" data-diff-tab="counts">Counts</button>
+                        <button class="diff-tab" type="button" data-diff-tab="quantities">Quantities</button>
+                        <button class="diff-tab" type="button" data-diff-tab="materials">Materials</button>
+                    </div>
+                    <div class="diff-section diff-section--compact diff-section--filters diff-section--no-anim">
+                        <div class="diff-section__header">
+                            <h3>Active Filters</h3>
+                            <button class="diff-reset" id="diff-reset" type="button">Reset isolate</button>
+                        </div>
+                        <div id="diff-active-filters" class="diff-filter-list"></div>
+                    </div>
+                    <div class="diff-section diff-section--compact diff-section--scroll diff-section--quantity">
+                        <div class="diff-section__header">
+                            <h3>Quantity Delta</h3>
+                        </div>
+                        <div id="diff-quantity" class="diff-list"></div>
+                    </div>
+                    <div class="diff-section diff-section--compact diff-section--scroll diff-section--count">
+                        <div class="diff-section__header">
+                            <h3>Count Delta</h3>
+                        </div>
+                        <div id="diff-counts" class="diff-list"></div>
+                    </div>
+                    <div class="diff-section diff-section--compact diff-section--scroll diff-section--materials">
+                        <div class="diff-section__header">
+                            <h3>Material Delta</h3>
+                            <div class="sync-toggle diff-toggle">
+                                <span class="sync-label">Hide Zero</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="material-hide-zero" checked>
+                                    <span class="toggle-track"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="diff-materials" class="diff-list material-list"></div>
+                    </div>
+                    <div class="diff-section">
+                        <h3>Log Citations</h3>
+                        <div id="diff-citations" class="diff-list"></div>
+                    </div>
+                    <div class="diff-section diff-section--compact diff-section--llm-summary">
+                        <div class="diff-section__header">
+                            <h3>LLM Summary</h3>
+                            <button class="diff-reset" id="llm-summary-btn" type="button">Summarize</button>
+                        </div>
+                        <div class="diff-llm-summary" id="llm-summary-output">
+                            <div class="diff-filter-empty">No summary yet.</div>
+                        </div>
+                        <div class="diff-llm-loading" id="llm-summary-loading" aria-hidden="true">
+                            <span class="spinner"></span>
+                            <span>Summarizing...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="llm-panel-content llm-panel-content--chat" id="llm-panel-chat">
+                    <div class="llm-chat-header">
+                        <span class="llm-chat-title">Chat</span>
+                        <div class="llm-chat-actions">
+                            <button class="llm-reset-button" id="llm-reset-button" type="button">Reset</button>
+                            <button class="llm-key-button" id="llm-key-button" type="button">API Key</button>
+                        </div>
+                    </div>
+                    <div class="llm-chat-log" id="llm-chat-log"></div>
+                    <div class="llm-chat-input">
+                        <textarea id="llm-chat-input" class="llm-textarea" rows="3" placeholder="Ask about the design change flow..." spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+                        <button id="llm-chat-send" class="llm-button llm-button--accent" type="button">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="llm-modal" id="llm-modal" aria-hidden="true">
+        <div class="llm-modal__backdrop" data-llm-close></div>
+        <div class="llm-modal__content" role="dialog" aria-modal="true" aria-label="LLM chat">
+            <button class="llm-modal__close" type="button" data-llm-close>Close</button>
+            <h3>API Key</h3>
+            <div class="llm-settings">
+                <label class="llm-label" for="llm-api-key">API Key</label>
+                <div class="llm-key-row">
+                    <input id="llm-api-key" class="llm-input" type="password" placeholder="sk-..." autocomplete="off">
+                    <button id="llm-save-key" class="llm-button" type="button">Save</button>
+                    <button id="llm-clear-key" class="llm-button llm-button--ghost" type="button">Clear</button>
+                </div>
+                <div id="llm-key-status" class="llm-status">Key status: not set</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initDiffView } from './src/script/diffView.js';
+        import { initLlmPanel } from './src/script/llmPanel.js';
+        document.addEventListener("DOMContentLoaded", () => {
+            initDiffView();
+            initLlmPanel();
+        });
+    </script>
+</body>
+</html>

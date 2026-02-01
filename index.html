@@ -1,0 +1,784 @@
+# index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Augmented BIM Log Design Change Management</title>
+    <link rel="icon" type="image/png" href="./?�마4.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:wght@400;500;600&family=Sora:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-top">
+                <p class="pill">Building Informatics Group</p>
+            </div>
+            <h1 class="hero-title">Augmented BIM Log-Based Real-Time Design Change Monitoring, Selective Rollback, and Design Patching</h1>
+            <p class="hero-subtitle">
+                Lightweight, log-driven change management that tracks element-level geometry and attributes,
+                enables time-based visualization, and applies selective rollback directly in BIM authoring tools.
+            </p>
+            <div class="hero-meta">
+                <span>Junghun Lee</span>
+                <span>Ghang Lee</span>
+                <span>Suhyung Jang</span>
+                <span>Seokho Hyun</span>
+            </div>
+            <div class="hero-affiliation">
+                Building Informatics Group, Department of Architecture and Architectural Engineering, Yonsei University, Seoul, Republic of Korea
+            </div>
+        </header>
+
+        <section id="intro-stack" class="section-grid">
+            <div class="media-card media-card--center media-card--media">
+                <button class="media-expand" type="button" data-video="teaser">View Large</button>
+                <video id="teaser" autoplay muted loop playsinline>
+                    <source src="./src/video/%EB%94%94%EC%9E%90%EC%9D%B8%20%ED%8C%A8%EC%B9%AD.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="text-card">
+                <h2>Augmented BIM Log in Context</h2>
+                <p>
+                    The proposed workflow captures modeling events as augmented BIM logs, reconstructs
+                    design states along a timeline, and selectively restores only the parts that need to be
+                    reverted. The result is precise, localized rollback without full model reversion.
+                </p>
+                <ul class="highlights">
+                    <li>Element-level log schema for geometry and attributes.</li>
+                    <li>Time-aware monitoring of quantity and geometry changes.</li>
+                    <li>Region-based selective rollback for focused review.</li>
+                    <li>Design patching that restores only targeted elements.</li>
+                </ul>
+            </div>
+            <div class="text-card">
+                <h2>Abstract</h2>
+                <p>
+                    Existing BIM change management relies on heavy, proprietary systems and post-hoc analysis.
+                    This study introduces an augmented BIM log schema that records element-level geometry and
+                    properties in a lightweight, structured format to enable real-time monitoring and interactive
+                    rollback. Three modules are implemented: design change monitoring, selective rollback, and
+                    design patching. Validation across multi-stage design changes reports 98.6% tracking accuracy
+                    and 93.6% accuracy for partial restoration. The results confirm the feasibility of log-based,
+                    selective rollback in practical BIM workflows.
+                </p>
+                <div class="keyword-row">
+                    <span class="keyword">BIM log</span>
+                    <span class="keyword">Visualization</span>
+                    <span class="keyword">Quantity change</span>
+                    <span class="keyword">Selective rollback</span>
+                    <span class="keyword">Design patching</span>
+                </div>
+            </div>
+            <figure class="media-card media-card--center media-card--media">
+                <button class="media-expand" type="button" data-image="concept-image">View Large</button>
+                <img id="concept-image" src="./src/image/image.png" alt="Concept of design patching">
+                <figcaption>Concept of design patching with localized rollback.</figcaption>
+            </figure>
+        </section>
+
+        <section id="overview-section">
+            <h2>Framework Overview</h2>
+            <div class="module-grid">
+                <article class="module-card">
+                    <h3>Design Change Monitoring</h3>
+                    <p>
+                        Reconstructs time-indexed model states from the ShapeLog and TimeLog to visualize
+                        geometry and quantity changes along the design timeline.
+                    </p>
+                </article>
+                <article class="module-card">
+                    <h3>Selective Rollback</h3>
+                    <p>
+                        Filters elements by user-defined spatial bounds, enabling region-specific time navigation
+                        and quantity analysis without changing the live model.
+                    </p>
+                </article>
+                <article class="module-card">
+                    <h3>Design Patching</h3>
+                    <p>
+                        Applies a filtered reverse log in the BIM authoring environment to restore only the
+                        targeted elements within a chosen time window.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section id="advanced-bim-log-section" class="section-grid">
+            <div class="text-card">
+                <h3>Design Change Mangement</h3>
+                <p>
+                    The schema separates temporal state tracking (TimeLog) from element state definitions
+                    (ShapeLog). Element versions are indexed to preserve edit history and allow precise
+                    reconstruction of previous design states without storing full snapshots.
+                </p>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">11</span>
+                        <span class="stat-label">Targeted element categories</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">72%</span>
+                        <span class="stat-label">Storage reduction vs. backups</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">96.3%</span>
+                        <span class="stat-label">Log reconstruction accuracy</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-card">
+                <h3>Design Patching</h3>
+                <p>
+                    Design patching reverses only the selected portion of the modeling history. By generating
+                    a PartialReversedLog, the system recreates, modifies, or deletes elements within a specified
+                    time window and spatial region while preserving the rest of the model.
+                </p>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">93.6%</span>
+                        <span class="stat-label">Overall patching accuracy</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">10</span>
+                        <span class="stat-label">Verification cases</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">7</span>
+                        <span class="stat-label">Cases with 100% accuracy</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="log-section">
+            <div class="schema-card">
+                <div class="schema-header">
+                    <h3>Augmented BIM Log Schema</h3>
+                    <p>JSON Schema overview used for time-series logging of element states and quantity takeoffs.</p>
+                </div>
+                <div class="schema-outline">
+                    <div class="schema-node level-1">
+                        <span class="schema-label">Metadata</span>
+                        <button type="button" class="schema-pill" data-path="Metadata > userId" data-desc="Unique identifier for the authoring user or session owner.">userId</button>
+                        <button type="button" class="schema-pill" data-path="Metadata > projectName" data-desc="Human-readable project name for the BIM log set.">projectName</button>
+                        <button type="button" class="schema-pill" data-path="Metadata > guid" data-desc="Unique GUID for the model or log file lineage.">guid</button>
+                        <button type="button" class="schema-pill" data-path="Metadata > startTime" data-desc="Session start timestamp in YYYY-MM-DD-HH-MM-SS format.">startTime</button>
+                        <button type="button" class="schema-pill" data-path="Metadata > endTime" data-desc="Session end timestamp in YYYY-MM-DD-HH-MM-SS format.">endTime</button>
+                        <button type="button" class="schema-pill" data-path="Metadata > saved" data-desc="Boolean flag indicating whether the session was saved.">saved</button>
+                    </div>
+                    <details class="schema-node level-1 schema-expand" open>
+                        <summary>
+                            <span class="schema-label">TimeLog</span>
+                            <button type="button" class="schema-pill schema-pill--summary" data-path="TimeLog > timeLog{}" data-desc="Dictionary keyed by timestamp (YYYY-MM-DD-HH-MM-SS). Each entry maps to elementVersionList and quantityLog.">timeLog{}</button>
+                        </summary>
+                        <div class="schema-children">
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">elementVersionList</div>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > elementVersionList" data-desc="Element versions active at this timestamp.">elementVersionList[]</button>
+                            </div>
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">quantityLog</div>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > quantityLog[]" data-desc="Array of quantity takeoff summaries at this timestamp.">quantityLog[]</button>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > quantityLog[] > elementCategory" data-desc="Category label for the takeoff entry (e.g., Wall, Floor).">elementCategory</button>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > quantityLog[] > takeOff[]" data-desc="List of takeoff items and quantities for the category.">takeOff[]</button>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > quantityLog[] > takeOff[] > takeOffItem" data-desc="Name of the takeoff item (e.g., Area, Volume).">takeOffItem</button>
+                                <button type="button" class="schema-pill" data-path="TimeLog > {timestamp} > quantityLog[] > takeOff[] > takeOffQuantity" data-desc="Quantity value of the takeoff item.">takeOffQuantity</button>
+                            </div>
+                        </div>
+                    </details>
+                    <details class="schema-node level-1 schema-expand" open>
+                        <summary>
+                            <span class="schema-label">ShapeLog</span>
+                            <button type="button" class="schema-pill schema-pill--summary" data-path="ShapeLog > shapeLog[]" data-desc="Detailed attribute and geometry logs for a specific element version.">shapeLog[]</button>
+                        </summary>
+                        <div class="schema-children">
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle"button" class="schema-pill" data-path="ShapeLog > identifiers" data-desc="Element identifiers such as category and family.">identifiers</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > identifiers > elementId" data-desc="Original Element ID from the BIM authoring tool.">elementId</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > identifiers > elementCategory" data-desc="Element category (Wall, Floor, Column, etc.).">elementCategory</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > identifiers > elementFamily" data-desc="Element family name or type.">elementFamily</button>
+                            </div>
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">placement</div>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > placement" data-desc="Placement data including base point, plane, host, and orientation.">placement</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > placement > basePoint" data-desc="XYZ base point for element placement.">basePoint</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > placement > basePlane" data-desc="Level or plane where the element is placed.">basePlane</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > placement > hostReference" data-desc="Host element reference (e.g., window hosted by wall).">hostReference</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > placement > orientation" data-desc="Orientation vector for element placement.">orientation</button>
+                            </div>
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">materialLayers</div>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > materialLayers" data-desc="Layered material composition for elements like walls or floors.">materialLayers</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > materialLayers > materialName" data-desc="Material name for the layer.">materialName</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > materialLayers > function" data-desc="Material function (finish, structure, insulation, etc.).">function</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > materialLayers > materialQuantity" data-desc="Material quantity contribution for the layer.">materialQuantity</button>
+                            </div>
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">parameters</div>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > parameters" data-desc="Element parameter list (name, storage type, value).">parameters</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > parameters > name" data-desc="Parameter name.">name</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > parameters > storageType" data-desc="Parameter storage type (string, double, integer).">storageType</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > parameters > value" data-desc="Numeric parameter value.">value</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > parameters > valueString" data-desc="String representation of the parameter value.">valueString</button>
+                            </div>
+                            <div class="schema-subgroup">
+                                <div class="schema-subtitle">meshArray</div>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray" data-desc="Mesh data defining element geometry (vertices, indices, material).">meshArray</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray > material" data-desc="Material name for the mesh group.">material</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray > color" data-desc="RGB color values for the mesh.">color</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray > opacity" data-desc="Opacity value for the mesh.">opacity</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray > vertices" data-desc="Flattened XYZ vertex array.">vertices</button>
+                                <button type="button" class="schema-pill" data-path="ShapeLog > meshArray > indices" data-desc="Index array defining mesh faces.">indices</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <details class="schema-details">
+                    <summary>
+                        <span class="schema-summary-label">Example (JSON)</span>
+                        <a class="schema-download" href="./augmentedBIMlog_schema.json" download="augmentedBIMlog_schema.json">Download</a>
+                    </summary>
+                <pre class="schema-pre"><code>{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://github.com/junghunlee/augmentedBimLogSchema/augmentedBimTLog.v4r1.schema.json",
+  "title": "Augmented BIM Log Schema",
+  "description": "A time-series log of BIM design changes in shape and quantity.",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "guid": {
+      "type": "string"
+    },
+    "startTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}$",
+      "description": "Timestamp in YYYY-MM-DD-HH-MM-SS format"
+    },
+    "endTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}$",
+      "description": "Timestamp in YYYY-MM-DD-HH-MM-SS format"
+    },
+    "saved": {
+      "type": "boolean"
+    },
+    "timeLog": {
+      "type": "object",
+      "description": "Dictionary keyed by timestamp (YYYY-MM-DD-HH-MM-SS). Each timestamp maps to elementVersionList and quantityLog.",
+      "patternProperties": {
+        "^\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}$": {
+          "type": "object",
+          "properties": {
+            "elementVersionList": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "elementVersion": {
+                    "type": "string",
+                    "description": "A unique element version identifier at the event time in the form of elementID_version"
+                  }
+                },
+                "required": ["elementVersion"],
+                "additionalProperties": false
+              }
+            },
+            "quantityLog": {
+              "type": "array",
+              "description": "Array of BIM elements with their properties at this save point",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "elementCategory": {
+                    "type": "string",
+                    "description": "The element category such as walls and columns"
+                  },
+                  "takeOff": {
+                    "type": "array",
+                    "description": "Custom properties for this element",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "takeOffItem": {
+                          "type": "string"
+                        },
+                        "takeOffQuantity": {
+                          "oneOf": [
+                            { "type": "string" },
+                            { "type": "number" },
+                            { "type": "integer" }
+                          ]
+                        }
+                      },
+                      "required": ["takeOffItem", "takeOffQuantity"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["elementCategory"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["elementVersionList", "quantityLog"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "shapeLog": {
+      "type": "array",
+      "description": "Array of attribute and geometric information",
+      "items": {
+        "type": "object",
+        "properties": {
+          "elementId": {
+            "type": "string"
+          },
+          "commandType": {
+            "type": "string",
+            "description": "The command type - C: created, M: modified, D: deleted",
+            "enum": ["C", "M", "D"]
+          },
+          "identifiers": {
+            "type": "object",
+            "properties": {
+              "elementId": {
+                "type": "string"
+              },
+              "elementCategory": {
+                "type": "string",
+                "description": "The element category such as walls or columns"
+              },
+              "elementFamily": {
+                "type": "string"
+              }
+            }
+          },
+          "placement": {
+            "type": "object",
+            "description": "Placement information of the element",
+            "properties": {
+              "basePoint": {
+                "type": "array",
+                "description": "XYZ values",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "basePlane": {
+                "type": "string",
+                "description": "The level, floor, or plane that the element is placed on"
+              },
+              "hostReference": {
+                "type": "string",
+                "description": "A host element that an element is nested within (e.g., a window in a wall)"
+              },
+              "orientation": {
+                "type": "array",
+                "description": "Direction vector defining the placement/facing direction (XYZ unit vector)",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "materialLayers": {
+            "type": "array",
+            "description": "Array of material layers of each element",
+            "items": {
+              "type": "object",
+              "properties": {
+                "materialName": {
+                  "type": "string"
+                },
+                "function": {
+                  "type": "string"
+                },
+                "materialQuantity": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "description": "Array of element parameters",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "storageType": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "number"
+                },
+                "valueString": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "meshArray": {
+            "type": "array",
+            "description": "Array of meshes that defines an element shape",
+            "items": {
+              "type": "object",
+              "properties": {
+                "material": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "array",
+                  "description": "RGB colors",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "opacity": {
+                  "type": "integer"
+                },
+                "vertices": {
+                  "type": "array",
+                  "description": "Flattened XYZ values",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "indices": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["userId", "projectName", "guid", "timeLog"],
+  "additionalProperties": false
+}</code></pre>
+                </details>
+            </div>
+        </section>
+
+        <section id="full-visualization" class="demo-section">
+            <div class="demo-header">
+                <div>
+                    <h2>Full Design Change Monitoring</h2>
+                    <p>
+                        Navigate the entire model timeline, inspect quantities, and explore element-level
+                        metadata synchronized with each timestamp.
+                    </p>
+                </div>
+                <button id="fully-demo" class="demo" onclick="window.location.href='https://leejunghun1234.github.io/FullyVisualization/'">Open Demo</button>
+            </div>
+            <div id="fully-target" class="viewer-surface"></div>
+            <div id="fully-slider-target">
+                <input type="range" id="fully-slider" class="slider">
+            </div>
+
+            <section class="accordion-section">
+                <button class="accordion-toggle">Open quantity and element panels</button>
+                <div class="accordion-content">
+                    <div id="qto-div" class="info-div">
+                        <h3 class="info-title">Quantity Takeoff</h3>
+                        <div class="info-target" id="info-target"></div>
+                    </div>
+                    <div id="element-div" class="info-div">
+                        <h3 class="info-title">Selected Element Properties</h3>
+                        <div class="element-target" id="element-target"></div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section id="partial-visualization" class="demo-section">
+            <div class="demo-header">
+                <div>
+                    <h2>Selective Rollback Visualization</h2>
+                    <p>
+                        Define a spatial region, isolate affected elements, and compare changes without
+                        disturbing the rest of the model.
+                    </p>
+                </div>
+                <button id="partially-demo" class="demo" onclick="window.location.href='https://leejunghun1234.github.io/PartiallyVisualization/'">Open Demo</button>
+            </div>
+            <div id="partially-target" class="viewer-surface"></div>
+            <div id="p-button-container">
+                <button class="partial-button Visible" id="inside-button">Inside</button>
+                <button class="partial-button Visible" id="outside-button">Outside</button>
+                <button class="partial-button" id="plane-button">Plane</button>
+            </div>
+            <div class="clip-panel" id="clip-panel">
+                <div class="clip-panel__header">
+                    <div class="clip-panel__title">Clipping Bounds</div>
+                    <button class="clip-reset" id="clip-reset" type="button">Reset</button>
+                </div>
+                <div class="clip-grid">
+                    <label class="clip-row">
+                        <span class="clip-label">X Min</span>
+                        <input class="clip-slider" type="range" id="clip-x-min">
+                        <span class="clip-value" id="clip-x-min-value">0</span>
+                    </label>
+                    <label class="clip-row">
+                        <span class="clip-label">X Max</span>
+                        <input class="clip-slider" type="range" id="clip-x-max">
+                        <span class="clip-value" id="clip-x-max-value">0</span>
+                    </label>
+                    <label class="clip-row">
+                        <span class="clip-label">Y Min</span>
+                        <input class="clip-slider" type="range" id="clip-y-min">
+                        <span class="clip-value" id="clip-y-min-value">0</span>
+                    </label>
+                    <label class="clip-row">
+                        <span class="clip-label">Y Max</span>
+                        <input class="clip-slider" type="range" id="clip-y-max">
+                        <span class="clip-value" id="clip-y-max-value">0</span>
+                    </label>
+                    <label class="clip-row">
+                        <span class="clip-label">Z Min</span>
+                        <input class="clip-slider" type="range" id="clip-z-min">
+                        <span class="clip-value" id="clip-z-min-value">0</span>
+                    </label>
+                    <label class="clip-row">
+                        <span class="clip-label">Z Max</span>
+                        <input class="clip-slider" type="range" id="clip-z-max">
+                        <span class="clip-value" id="clip-z-max-value">0</span>
+                    </label>
+                </div>
+            </div>
+            <div id="partially-slider-target">
+                <input type="range" id="partially-slider" class="slider">
+            </div>
+        </section>
+
+        <section id="design-patching" class="section-grid">
+            <div class="text-card">
+                <h3>Limitations and Future Work</h3>
+                <p>
+                    Current patching does not automatically re-establish complex relational constraints such as
+                    Join or Split, and the scope is limited to architectural categories. Future work will expand
+                    to structural and MEP elements and incorporate relationship-aware logging for more robust
+                    rollback.
+                </p>
+            </div>
+        </section>
+
+        <section id="resources-section">
+            <h2>Data and Resources</h2>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <h3>Data Availability</h3>
+                    <p>
+                        The augmented BIM log schema, example datasets, and demonstration materials are publicly
+                        available in the project repository.
+                    </p>
+                </div>
+                <div class="resource-card">
+                    <h3>Acknowledgements</h3>
+                    <p>
+                        Supported by the National Research Foundation of Korea (RS-2025-23324132).
+                    </p>
+                </div>
+                <div class="resource-card">
+                    <h3>Contact</h3>
+                    <p>Author: dlwjdgjs98@yonsei.ac.kr</p>
+                    <p>Corresponding author: glee@yonsei.ac.kr</p>
+                </div>
+            </div>
+        </section>
+
+
+        <footer>
+            <button class="test-site-button" id="test-site-button" onclick="window.location.href='test-site.html'">Test Site</button>`r`n            
+            <p>2025 Building Informatics Group, Yonsei University</p>
+        </footer>
+    </div>
+
+    <div class="media-modal" id="media-modal" aria-hidden="true">
+        <div class="media-modal__backdrop" data-modal-close></div>
+        <div class="media-modal__content" role="dialog" aria-modal="true" aria-label="Media preview">
+            <button class="media-modal__close" type="button" data-modal-close>Close</button>
+            <video id="media-modal-video" controls playsinline></video>
+            <img id="media-modal-image" alt="Media preview">
+        </div>
+    </div>
+
+    <script type="module">
+        import { main } from './src/script/main.js';
+        document.addEventListener("DOMContentLoaded", () => {
+            main("fully-target", "fully-slider", false);
+            main("partially-target", "partially-slider", true);
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const toggles = document.querySelectorAll(".accordion-toggle");
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener("click", () => {
+                    const content = toggle.nextElementSibling;
+                    content.classList.toggle("open");
+
+                    if (content.classList.contains("open")) {
+                        toggle.textContent = "Collapse quantity and element panels";
+                    } else {
+                        toggle.textContent = "Open quantity and element panels";
+                    }
+                });
+            });
+            const schemaPills = document.querySelectorAll(".schema-pill[data-desc]");
+            let activeInfoPanel = null;
+            const closeInfoPanel = () => {
+                if (!activeInfoPanel) {
+                    return;
+                }
+                activeInfoPanel.remove();
+                activeInfoPanel = null;
+            };
+            schemaPills.forEach((pill) => {
+                pill.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    const isActive = pill.classList.contains("is-active");
+                    closeInfoPanel();
+                    schemaPills.forEach((item) => item.classList.remove("is-active"));
+                    if (isActive) {
+                        return;
+                    }
+                    schemaPills.forEach((item) => item.classList.remove("is-active"));
+                    pill.classList.add("is-active");
+                    const desc = pill.dataset.desc;
+                    const path = pill.dataset.path || pill.textContent.trim();
+                    if (!desc) {
+                        return;
+                    }
+                    if (path === "Metadata > saved") {
+                        return;
+                    }
+                    const host = pill.closest(".schema-subgroup") || pill.closest(".schema-node");
+                    if (!host) {
+                        return;
+                    }
+                    const panel = document.createElement("div");
+                    panel.className = "schema-info-panel schema-info-panel--inline";
+                    panel.innerHTML = `
+                        <div class="schema-info-title">Field Details</div>
+                        <div class="schema-info-path">${path}</div>
+                        <div class="schema-info-desc">${desc}</div>
+                    `;
+                    host.insertAdjacentElement("afterend", panel);
+                    requestAnimationFrame(() => {
+                        panel.classList.add("is-visible");
+                    });
+                    activeInfoPanel = panel;
+                });
+            });
+
+            const modal = document.getElementById("media-modal");
+            const modalVideo = document.getElementById("media-modal-video");
+            const modalImage = document.getElementById("media-modal-image");
+            const expandButtons = document.querySelectorAll(".media-expand[data-video], .media-expand[data-image]");
+            const closeButtons = document.querySelectorAll("[data-modal-close]");
+
+            const openModalWithVideo = (video) => {
+                if (!modal || !modalVideo || !modalImage || !video) {
+                    return;
+                }
+                modalImage.style.display = "none";
+                modalVideo.src = video.currentSrc || video.src;
+                modalVideo.currentTime = video.currentTime || 0;
+                modalVideo.style.display = "block";
+                modal.classList.add("is-open");
+                modal.setAttribute("aria-hidden", "false");
+                modalVideo.play().catch(() => {});
+            };
+
+            const openModalWithImage = (image) => {
+                if (!modal || !modalVideo || !modalImage || !image) {
+                    return;
+                }
+                modalVideo.pause();
+                modalVideo.removeAttribute("src");
+                modalVideo.load();
+                modalVideo.style.display = "none";
+                modalImage.src = image.currentSrc || image.src;
+                modalImage.alt = image.alt || "Media preview";
+                modalImage.style.display = "block";
+                modal.classList.add("is-open");
+                modal.setAttribute("aria-hidden", "false");
+            };
+
+            const closeModal = () => {
+                if (!modal || !modalVideo || !modalImage) {
+                    return;
+                }
+                modal.classList.remove("is-open");
+                modal.setAttribute("aria-hidden", "true");
+                modalVideo.pause();
+                modalVideo.removeAttribute("src");
+                modalVideo.load();
+                modalVideo.style.display = "none";
+                modalImage.removeAttribute("src");
+                modalImage.style.display = "none";
+            };
+
+            expandButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const targetVideoId = button.getAttribute("data-video");
+                    const targetImageId = button.getAttribute("data-image");
+                    if (targetVideoId) {
+                        const video = document.getElementById(targetVideoId);
+                        openModalWithVideo(video);
+                        return;
+                    }
+                    if (targetImageId) {
+                        const image = document.getElementById(targetImageId);
+                        openModalWithImage(image);
+                    }
+                });
+            });
+
+            closeButtons.forEach((button) => {
+                button.addEventListener("click", closeModal);
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    closeModal();
+                }
+            });
+        });
+</script>
+</body>
+</html>
