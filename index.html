@@ -48,6 +48,48 @@
                     실행 시 “Windows가 PC를 보호했습니다” 창이 뜨면 <b>추가 정보 → 실행</b> 을 누르세요(서명 없는 설치 파일이라 정상입니다).
                 </div>
             </div>
+
+            <style>
+                .abl-guide { margin-top:24px; max-width:900px; background:var(--panel); border-radius:var(--radius-md); box-shadow:var(--shadow); padding:22px 26px; text-align:left; }
+                .abl-guide h3 { margin:0 0 2px; font-size:18px; color:var(--ink); }
+                .abl-guide .abl-guide-sub { color:var(--muted); font-size:13px; margin-bottom:16px; }
+                .abl-guide-cols { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+                .abl-guide-cols h4 { margin:0 0 8px; font-size:15px; color:var(--accent); }
+                .abl-guide ol { margin:0; padding-left:20px; }
+                .abl-guide li { margin:7px 0; font-size:14px; line-height:1.65; color:var(--ink); }
+                .abl-guide .abl-warn { background:rgba(209,106,70,0.10); border-left:3px solid var(--accent); padding:11px 15px; border-radius:8px; font-size:13px; color:var(--ink); margin-top:16px; line-height:1.7; }
+                @media (max-width:720px){ .abl-guide-cols { grid-template-columns:1fr; gap:20px; } }
+            </style>
+            <div class="abl-guide">
+                <h3>설치 &amp; 사용 가이드</h3>
+                <div class="abl-guide-sub">Windows 전용 · Revit 2025 / 2026 / 2027</div>
+                <div class="abl-guide-cols">
+                    <div>
+                        <h4>설치</h4>
+                        <ol>
+                            <li><b>Revit을 완전히 종료</b>하세요 (실행 중이면 설치가 실패합니다).</li>
+                            <li>내려받은 <b>.exe</b>를 실행합니다. <b>개인 백신이 막으면 잠시 꺼주세요</b> — 서명 없는 새 설치 파일이라 생기는 오탐이며 악성이 아닙니다.</li>
+                            <li>“Windows가 PC를 보호했습니다” 창이 뜨면 <b>추가 정보 → 실행</b>.</li>
+                            <li>가능하면 <b>우클릭 → 관리자 권한으로 실행</b>.</li>
+                            <li>언어(<b>한국어 / English</b>)를 고르면 설치 완료 — 설치된 모든 Revit 버전에 자동 등록됩니다.</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4>사용</h4>
+                        <ol>
+                            <li>Revit 실행 → <b>부가 기능(Add-Ins)</b> 탭에 <b>Augmented BIM Log</b> · <b>Recording</b> 패널이 생깁니다.</li>
+                            <li>모델을 변경한 뒤 <b>저장(Ctrl+S)</b> — 저장할 때 로그가 쌓입니다. <b>(저장을 해야 데이터가 생겨요)</b></li>
+                            <li><b>전처리</b> 클릭 → 로그를 합쳐 뷰어 데이터·물량을 만듭니다.</li>
+                            <li><b>뷰어 열기</b> → 브라우저에서 타임라인·물량·녹음 확인. <b>전처리 후에는 뷰어를 새로 여세요.</b></li>
+                            <li>필요하면 <b>비교하기</b>(두 시점 나란히) · <b>녹음 시작</b>(설명 음성을 타임라인과 동기 재생).</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="abl-warn">
+                    처음 흐름 요약 &nbsp;→&nbsp; <b>모델 변경 → 저장(Ctrl+S) → 전처리 → 뷰어 열기</b><br>
+                    녹음은 마이크가 필요하며, Windows 기본 입력 장치가 올바른 마이크로 설정돼 있어야 합니다.
+                </div>
+            </div>
         </header>
 
         <section id="intro-stack" class="section-grid">
