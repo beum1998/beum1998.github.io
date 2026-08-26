@@ -41,13 +41,20 @@
                 Building Informatics Group, Department of Architecture and Architectural Engineering, Yonsei University, Seoul, Republic of Korea
             </div>
             <div class="hero-download" style="margin-top:24px;">
-                <a href="./downloads/AugmentedBIMLog_Setup.exe" download
-                   style="display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;font-weight:700;font-size:16px;text-decoration:none;padding:14px 26px;border-radius:14px;box-shadow:var(--shadow);">
-                    ↓ Download the Revit Add-in (Windows)
-                </a>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <a href="./downloads/AugmentedBIMLog_Setup.exe" download
+                       style="display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;font-weight:700;font-size:16px;text-decoration:none;padding:14px 26px;border-radius:14px;box-shadow:var(--shadow);">
+                        ↓ Download the Revit Add-in (Windows)
+                    </a>
+                    <a href="https://www.sciencedirect.com/science/article/pii/S1474034626008013" target="_blank" rel="noopener"
+                       style="display:inline-flex;align-items:center;gap:10px;background:var(--panel);color:var(--accent);font-weight:700;font-size:16px;text-decoration:none;padding:14px 26px;border-radius:14px;border:1.5px solid var(--accent);box-shadow:var(--shadow);">
+                        📄 Read the Full Paper
+                    </a>
+                </div>
                 <div style="margin-top:10px;color:var(--muted);font-size:13.5px;line-height:1.6;">
                     v1.6.4 · Revit 2025 / 2026 / 2027 · appears under the <b>Add-Ins</b> tab after installation.<br>
-                    If “Windows protected your PC” appears, click <b>More info → Run anyway</b> (normal for an unsigned installer).
+                    If “Windows protected your PC” appears, click <b>More info → Run anyway</b> (normal for an unsigned installer).<br>
+                    For full methodology, experiments, and results, please refer to the <a href="https://www.sciencedirect.com/science/article/pii/S1474034626008013" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;">published paper</a>.
                 </div>
             </div>
 
@@ -136,7 +143,7 @@
             </div>
             <figure class="media-card media-card--center media-card--media">
                 <button class="media-expand" type="button" data-image="concept-image">View Large</button>
-                <img id="concept-image" src="./src/image/image.png" alt="Concept of design patching">
+                <img id="concept-image" src="./src/image/Figure2.png" alt="Concept of design patching">
                 <figcaption>Concept of design patching with localized rollback.</figcaption>
             </figure>
         </section>
@@ -553,7 +560,7 @@
                         metadata synchronized with each timestamp.
                     </p>
                 </div>
-                <button id="fully-demo" class="demo" onclick="window.location.href='https://leejunghun1234.github.io/FullyVisualization/'">Open Demo</button>
+                <button id="fully-demo" class="demo" onclick="window.location.href='./FullyVisualization/'">Open Demo</button>
             </div>
             <div id="fully-target" class="viewer-surface"></div>
             <div id="fully-slider-target">
