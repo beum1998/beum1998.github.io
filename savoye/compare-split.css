@@ -1,0 +1,303 @@
+/* ============================================================================
+   분할 비교 — 기존 비교 화면(compare.html)의 배치 · 기능 · 알고리즘을 그대로 옮긴 부분
+   (A · B 카드, 비교 탭의 요약 · 개수 · 물량 · 재료 · 변경 요소 · AI 요약).
+
+   배치(그리드 · 섹션 순서 · 슬라이더 · 미끄러지는 탭 표시)는 기존 그대로 두고,
+   생김새는 뷰어의 다른 화면과 같은 토큰(tokens.css) · 부품(ui.css)을 쓴다 (2026-09-28 사용자 결정).
+   버튼 · 입력 · 스위치 · 필터 칩은 마크업에 .btn · .field · .switch · .chip 을 붙여 얻고,
+   여기에는 이 화면에만 있는 조각(A/B 카드 머리, 저장한 시점, 개수 표, 탭 표시)만 둔다.
+   뷰어 페이지의 다른 요소와 섞이지 않도록 .cmp-scope 안으로만 적용한다.
+   ============================================================================ */
+
+.cmp-font { font-family: var(--font); font-size: var(--fs-md); line-height: var(--lh-body); color: var(--text); }
+.cmp-scope h2, .cmp-scope h3 { margin-top: 0; color: var(--text); letter-spacing: -.01em; }
+
+/* ── 분할 시 두 뷰어 = A(이전) · B(현재) 카드 ──────────────────────────────── */
+/* 카드 머리 · 시점 컨트롤은 분할일 때만 (ID 선택자로 아래 .panel-header 규칙보다 우선) */
+#stage .pane > .pane-card-head,
+#stage .pane > .panel-controls { display: none; }
+#root.is-split #stage .pane > .pane-card-head,
+#root.is-split #stage .pane > .panel-controls { display: flex; }
+
+/* 하단 패널 접기 손잡이가 카드의 시점 슬라이더를 가리지 않게 */
+#root.is-split #stage { padding-bottom: 30px; }
+
+#root.is-split #stage .pane {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-sm);
+    border: 1px solid var(--border);
+    padding: var(--sp-5);
+    gap: var(--sp-3);
+}
+#root.is-split #stage .pane .viewer-host {
+    background: var(--scene);
+    border-radius: var(--r);
+    overflow: hidden;
+}
+#root.is-split .pane--main .pane-head { display: none; }
+
+.cmp-scope .panel-header { display: flex; align-items: center; justify-content: flex-start; gap: var(--sp-5); margin-bottom: 0; }
+.cmp-scope .panel-header h2 { display: inline-flex; align-items: center; gap: var(--sp-3); margin: 0; font-size: var(--fs-lg); font-weight: var(--fw-bold); }
+.cmp-scope .panel-meta { font-size: var(--fs-sm); color: var(--text-3); }
+
+.cmp-scope .pane-card-head { min-width: 0; min-height: var(--h-md); }
+.cmp-scope .pane-card-head h2 { white-space: nowrap; }
+.cmp-scope .pane-card-pin {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    min-width: 0; height: 22px; padding: 0 var(--sp-4); border-radius: var(--r-pill);
+    background: var(--pin-soft); color: var(--pin-ink); font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+}
+.cmp-scope .pane-card-pin .ico { color: var(--pin); flex: none; }
+.cmp-scope .pane-card-pin span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-scope .pane-card-close { margin-left: auto; }
+.cmp-scope .pane-card-toggles { margin-left: auto; display: flex; align-items: center; gap: var(--sp-7); min-width: 0; }
+
+.cmp-scope .panel-controls { display: flex; flex-direction: column; gap: var(--sp-3); position: relative; z-index: 2; margin-top: var(--sp-1); }
+.cmp-scope .control-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-5); }
+.cmp-scope .control-label { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-2); }
+
+/* 저장한 시점 — 누르면 그 시점으로, ×로 지우기 (diffView.js renderSaved) */
+.cmp-scope .saved-times { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.cmp-scope .saved-times:empty { display: none; }
+.cmp-scope .saved-time {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    height: var(--h-xs); padding: 0 var(--sp-2) 0 var(--sp-4);
+    border: 1px solid var(--border); border-radius: var(--r-pill);
+    background: var(--surface); color: var(--text-2);
+    font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.cmp-scope .saved-time:hover { border-color: var(--border-2); color: var(--text); }
+.cmp-scope .saved-time__label { background: transparent; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0; white-space: nowrap; }
+.cmp-scope .saved-time__remove {
+    display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: none;
+    background: transparent; color: var(--text-3); font-size: var(--fs-sm); line-height: 1; cursor: pointer;
+}
+.cmp-scope .saved-time__remove:hover { background: var(--surface-3); color: var(--text); }
+
+/* 시점 슬라이더 (+ 위쪽 핀 표시) — 메인 타임라인과 같은 모양: 6px 선 + 흰 손잡이. A 는 이전(앰버), B 는 현재(파랑) */
+.cmp-scope .slider-wrap { position: relative; padding-top: 16px; --thumb: 20px; }
+.cmp-scope .slider-wrap .tl-markers { top: 0; }
+.cmp-scope .slider {
+    --fill: var(--accent);
+    width: 100%; height: 26px; margin: 0; display: block;
+    -webkit-appearance: none; appearance: none; outline: none; cursor: pointer;
+    background: var(--track) center / 100% 6px no-repeat;
+    border-radius: var(--r-pill);
+}
+.cmp-scope .slider--before { --fill: var(--before); background: linear-gradient(to left, var(--fill) var(--slider-fill, 0%), var(--track) 0%) center / 100% 6px no-repeat; }
+.cmp-scope .slider--after { background: linear-gradient(to right, var(--fill) var(--slider-fill, 0%), var(--track) 0%) center / 100% 6px no-repeat; }
+.cmp-scope .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: var(--thumb); height: var(--thumb); border-radius: 50%;
+    background: var(--surface); border: 3px solid var(--fill);
+    box-shadow: 0 2px 6px rgba(16, 24, 40, .22);
+    transition: transform var(--dur-fast) var(--ease);
+}
+.cmp-scope .slider:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.cmp-scope .slider:focus-visible { box-shadow: none; }
+.cmp-scope .slider:focus-visible::-webkit-slider-thumb { box-shadow: var(--ring); }
+.cmp-scope .slider::-moz-range-track { height: 6px; border-radius: var(--r-pill); background: transparent; }
+.cmp-scope .slider::-moz-range-thumb {
+    box-sizing: border-box; width: var(--thumb); height: var(--thumb); border-radius: 50%;
+    background: var(--surface); border: 3px solid var(--fill); box-shadow: 0 2px 6px rgba(16, 24, 40, .22);
+}
+
+.cmp-scope .slider-tooltip {
+    position: absolute; top: -48px; z-index: 5;
+    padding: var(--sp-3) var(--sp-5); border-radius: var(--r-sm);
+    background: #111827; color: #fff;
+    font: var(--fw-semibold) var(--fs-sm) / var(--lh-tight) var(--mono);
+    white-space: pre-line; text-align: center; pointer-events: none;
+    box-shadow: var(--sh-float);
+    opacity: 0; transform: translateY(-6px);
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+.cmp-scope .slider-tooltip::after {
+    content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
+    border-width: 6px 6px 0; border-style: solid; border-color: #111827 transparent transparent;
+}
+.cmp-scope .slider-tooltip.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ── 비교 탭 패널 ─────────────────────────────────────────────────────────── */
+#compare-divs .panel-card {
+    flex: 1; min-height: 0; margin-bottom: var(--sp-6);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--sh-xs);
+    padding: var(--sp-5) var(--sp-6);
+    display: flex; flex-direction: column; gap: var(--sp-7);
+    overflow: hidden;
+    container-type: inline-size;
+}
+
+/* A · B 시점 요약 카드 */
+.cmp-scope .diff-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); margin-top: var(--sp-1); }
+.cmp-scope .diff-summary--standalone { margin: var(--sp-2) 0 var(--sp-4); }
+.cmp-scope .diff-summary-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: var(--sp-4) var(--sp-5); min-width: 0; }
+.cmp-scope .diff-summary-title { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-2); }
+.cmp-scope .diff-summary-value { font: var(--fw-medium) var(--fs-xs) var(--mono); margin-top: var(--sp-2); color: var(--text); }
+.cmp-scope .diff-summary-pin { display: flex; align-items: center; gap: var(--sp-2); margin-top: var(--sp-1); font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--pin-ink); }
+.cmp-scope .diff-summary-pin .ico { color: var(--pin); flex: none; }
+.cmp-scope .diff-summary-pin span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.cmp-scope .llm-panel-content--diff {
+    display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; gap: var(--sp-6);
+    overflow-y: auto; height: 100%; width: 100%; scrollbar-gutter: stable;
+}
+.cmp-scope .llm-panel-content--diff .diff-section { min-height: 0; display: flex; flex-direction: column; position: relative; }
+.cmp-scope .llm-panel-content--diff .diff-list { flex: 1; max-height: none; }
+
+.cmp-scope .diff-section-slide { animation: cmp-diff-section-slide .24s var(--ease); }
+@keyframes cmp-diff-section-slide { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+
+.cmp-scope .diff-section h3 { margin: 0 0 var(--sp-4); font-size: var(--fs-md); font-weight: var(--fw-bold); }
+.cmp-scope .diff-section--compact { margin-top: var(--sp-3); }
+.cmp-scope .diff-section__header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); }
+.cmp-scope .diff-section__header h3 { margin-bottom: var(--sp-4); }
+
+/* 요약 · 개수 · 물량 · 재료 탭 — 세그먼트(ui.css .seg)와 같은 모양. 흰 표시가 고른 탭으로 미끄러진다 */
+.cmp-scope .diff-tabs {
+    --tab-columns: 4; --tab-rows: 1; --active-col: 0; --active-row: 0;
+    --tab-h: var(--h-sm); --tab-pad: var(--sp-1); --tab-gap: var(--sp-1);
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: var(--tab-h);
+    gap: var(--tab-gap); padding: var(--tab-pad);
+    border-radius: var(--r-pill); background: var(--surface-3);
+    align-self: stretch; width: 100%; margin-bottom: var(--sp-2);
+    position: relative; z-index: 1; overflow: hidden; flex: none;
+    min-height: calc(var(--tab-h) * var(--tab-rows) + var(--tab-pad) * 2 + (var(--tab-rows) - 1) * var(--tab-gap));
+}
+.cmp-scope .diff-tab {
+    position: relative; z-index: 1;
+    height: var(--tab-h); width: 100%; padding: 0 var(--sp-4);
+    border: none; border-radius: var(--r-pill); background: transparent;
+    color: var(--text-2); font: var(--fw-semibold) var(--fs-sm) / 1 var(--font);
+    text-align: center; white-space: nowrap; cursor: pointer;
+    transition: color var(--dur-fast) ease;
+}
+.cmp-scope .diff-tab:hover { color: var(--text); }
+.cmp-scope .diff-tab.is-active { color: var(--accent-ink); }
+.cmp-scope .diff-tabs::before {
+    content: ""; position: absolute; z-index: 0;
+    top: var(--tab-pad); left: var(--tab-pad);
+    width: calc((100% - var(--tab-pad) * 2 - (var(--tab-columns) - 1) * var(--tab-gap)) / var(--tab-columns));
+    height: calc((100% - var(--tab-pad) * 2 - (var(--tab-rows) - 1) * var(--tab-gap)) / var(--tab-rows));
+    background: var(--surface); border-radius: var(--r-pill); box-shadow: var(--sh-sm);
+    transform: translate(calc(var(--active-col) * (100% + var(--tab-gap))), calc(var(--active-row) * (100% + var(--tab-gap))));
+    transition: transform var(--dur) var(--ease);
+}
+@container (max-width: 420px) {
+    .cmp-scope .diff-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: var(--r); }
+}
+
+/* 목록 · 스크롤 칸 */
+.cmp-scope .diff-list { display: flex; flex-direction: column; gap: var(--sp-3); padding-right: var(--sp-3); overflow-y: auto; }
+.cmp-scope #diff-citations.diff-list { overflow: visible; padding-right: 0; }
+.cmp-scope .diff-section--scroll { display: flex; flex-direction: column; min-height: 0; flex: 1 1 0; overflow: hidden; }
+.cmp-scope .diff-section--scroll .diff-table,
+.cmp-scope .diff-section--scroll .diff-list { flex: 1 1 auto; min-height: 0; height: 90%; }
+.cmp-scope .diff-section--scroll .diff-table__list,
+.cmp-scope .diff-section--scroll .material-list,
+.cmp-scope .diff-section--scroll .diff-list { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.cmp-scope .diff-table__list { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: var(--sp-3); height: 90%; scrollbar-gutter: stable; }
+
+.cmp-scope .diff-section--filters { min-height: 80px; max-height: 220px; flex: 0 0 auto; overflow: hidden; }
+.cmp-scope .diff-section--filters .diff-filter-list { overflow: auto; max-height: 160px; padding-right: var(--sp-3); }
+.cmp-scope .diff-section--quantity { min-height: 260px; flex: 1 1 auto; }
+.cmp-scope .diff-section--count { min-height: 220px; flex: 1 1 auto; }
+.cmp-scope .diff-section--materials { flex: 1 1 auto; min-height: 220px; }
+
+/* 적용된 필터 — 칩은 .chip.is-on (compare.js) */
+.cmp-scope .diff-filter-list { display: flex; flex-direction: column; gap: var(--sp-5); }
+.cmp-scope .diff-filter-group { display: flex; flex-direction: column; gap: var(--sp-3); }
+.cmp-scope .diff-filter-title { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-3); }
+.cmp-scope .diff-filter-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.cmp-scope .diff-filter-empty { font-size: var(--fs-sm); color: var(--text-3); }
+
+/* 카테고리 × A · B · 증감 표 */
+.cmp-scope .diff-table { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; gap: var(--sp-3); }
+.cmp-scope .diff-table__head,
+.cmp-scope .diff-table__row { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: center; gap: var(--sp-4); }
+.cmp-scope .diff-table__head { padding: var(--sp-2) var(--sp-5); font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-3); }
+.cmp-scope .diff-table__head-label { justify-self: start; }
+.cmp-scope .diff-table__head-values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); text-align: right; padding: 0 var(--sp-5); }
+.cmp-scope .diff-table__row { text-align: left; font-size: var(--fs-sm); width: 100%; margin: 0 0 3px; }
+.cmp-scope .diff-table__row > span:first-child { text-align: left; font-weight: var(--fw-bold); color: var(--text); }
+/* 카테고리 칩 — 누르면 그 카테고리만 보기(.is-selected) */
+.cmp-scope .diff-table__cat {
+    display: inline-flex; align-items: center; justify-self: start;
+    width: 150px; min-height: var(--h-xs); padding: var(--sp-1) var(--sp-5);
+    border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface-2);
+    font: var(--fw-semibold) var(--fs-xs) / var(--lh-tight) var(--font); color: var(--text); text-align: left; white-space: normal;
+}
+.cmp-scope .diff-table__cat.is-clickable { cursor: pointer; transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease; }
+.cmp-scope .diff-table__cat.is-clickable:hover { border-color: var(--border-2); background: var(--surface); }
+.cmp-scope .diff-table__cat.is-selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.cmp-scope .diff-table__box {
+    appearance: none; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-4);
+    padding: var(--sp-1) var(--sp-5); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface);
+    text-align: right; font: var(--fw-medium) var(--fs-sm) var(--mono); font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+.cmp-scope .diff-table__box.is-disabled { cursor: default; }
+
+/* 재료 묶음 */
+.cmp-scope .diff-table--materials .material-group {
+    display: flex; flex-direction: column; gap: var(--sp-3);
+    padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface);
+}
+.cmp-scope .diff-table--materials .material-group + .material-group { margin-top: var(--sp-3); }
+.cmp-scope .diff-table--materials .material-group > summary { list-style: none; }
+.cmp-scope .diff-table--materials .material-group > summary::-webkit-details-marker { display: none; }
+.cmp-scope .diff-table--materials .material-summary { cursor: pointer; }
+.cmp-scope .diff-table--materials .material-items { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) 0 var(--sp-2) var(--sp-3); }
+.cmp-scope .diff-table--materials .material-item-row { font-size: var(--fs-sm); }
+.cmp-scope .diff-table--materials .material-item { font-weight: var(--fw-semibold); color: var(--text); }
+.cmp-scope .diff-table--materials .material-empty-row .material-metric { color: var(--text-3); }
+.cmp-scope .diff-table--materials .material-empty-row .diff-table__box { opacity: .7; }
+
+/* 변경 요소 줄(추가 · 삭제 · 수정 · 그대로) — 누르면 그것만 보기, [강조]로 칠하기 */
+.cmp-scope .diff-row {
+    display: grid; grid-template-columns: minmax(120px, 1fr) 1fr 1fr 1fr; align-items: center; gap: var(--sp-4);
+    padding: var(--sp-4) var(--sp-5); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface);
+    cursor: pointer; transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.cmp-scope .diff-row:hover { border-color: var(--border-2); box-shadow: var(--sh-sm); }
+.cmp-scope .diff-row.is-selected { background: var(--accent-soft); border-color: var(--accent); }
+.cmp-scope .diff-row.is-selected .diff-row-title { color: var(--accent-ink); }
+.cmp-scope .diff-row-title { justify-self: start; font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--text); }
+.cmp-scope .diff-row-values { display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-5); font: var(--fw-semibold) var(--fs-sm) var(--mono); color: var(--text-2); }
+.cmp-scope .diff-value, .cmp-scope .diff-delta { justify-self: end; }
+.cmp-scope .diff-delta { font-weight: var(--fw-bold); }
+.cmp-scope .diff-delta.up { color: var(--add); }
+.cmp-scope .diff-delta.down { color: var(--del); }
+.cmp-scope .diff-highlight-btn.is-active { background: var(--accent); border-color: var(--accent); color: var(--on-tone); }   /* .btn--soft, 켜지면 채움 */
+
+.cmp-scope .legacy-link { flex: none; margin-top: var(--sp-2); }
+/* 변경 요소는 내용만큼 자리를 차지한다(줄어들면 아래 영역과 겹친다) */
+.cmp-scope .diff-section--citations { flex: 0 0 auto; }
+
+/* ── AI 변경 요약 ─────────────────────────────────────────────────────────── */
+.cmp-scope .diff-section--llm-summary {
+    margin-top: var(--sp-6);
+    display: flex; flex-direction: column; flex: 0 0 auto;
+    min-height: 150px; max-height: none;   /* 패널이 스크롤하므로 요약 칸을 따로 가두지 않는다 */
+}
+.cmp-scope .diff-llm-summary {
+    flex: 1 1 auto; min-height: 90px; max-height: min(60vh, 460px);   /* 세 항목(사실 · 영향 · 추론)이 한눈에 들어오게 */
+    margin-top: var(--sp-3); padding: var(--sp-5) var(--sp-6);
+    border: 1px solid var(--border); border-radius: var(--r); background: var(--surface);
+    font-size: var(--fs-sm); line-height: var(--lh-read); color: var(--text); overflow: auto;
+}
+.cmp-scope .diff-llm-summary strong { font-weight: var(--fw-bold); }
+.cmp-scope .diff-llm-loading { display: none; margin-top: var(--sp-4); }
+.cmp-scope .diff-llm-loading.is-active { display: inline-flex; }
+
+.cmp-scope .diff-section--llm-summary .diff-section__header { flex-wrap: wrap; row-gap: var(--sp-3); }
+.cmp-scope .diff-section--llm-summary .diff-section__header h3 { white-space: nowrap; }
+.cmp-scope .ai-actions { display: inline-flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; justify-content: flex-end; }
+.cmp-scope .ai-model { min-width: 108px; max-width: 150px; }
+.cmp-scope .ai-key-btn.is-set { color: var(--add-ink); }   /* 키가 있으면 초록 글자 */
+.cmp-scope .ai-key-row { margin-top: var(--sp-4); }
+.cmp-scope .ai-note { margin-top: var(--sp-4); font-size: var(--fs-xs); line-height: 1.55; color: var(--text-3); }
+.cmp-scope .ai-stale { margin: -2px 0 var(--sp-4); }

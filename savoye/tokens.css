@@ -1,0 +1,172 @@
+/* ============================================================================
+   Augmented BIM Log — 디자인 토큰 (tokens.css)
+
+   화면의 모든 값(색 · 글자 · 간격 · 크기 · 모서리 · 그림자 · 움직임)은 여기 한 곳에서만 정한다.
+   컴포넌트(ui.css)와 화면(style.css · history.css · compare-split.css)은 이 변수만 쓴다.
+   새 값이 필요하면 먼저 여기에 이름을 붙여 더하고, 화면 CSS 에 숫자 · 색을 직접 쓰지 않는다.
+
+   밝고 차분한 작업 도구 톤. 3D 뷰가 주인공이고, 패널은 조용히 받쳐준다.
+   Revit 쪽 창(녹음 상태창 · 핀 창)은 같은 역할 색을 AblTheme.cs 로 옮겨 쓴다.
+   설명서: docs/DESIGN-SYSTEM.md
+   ============================================================================ */
+
+:root {
+    /* ── 글꼴 ─────────────────────────────────────────────────────────────── */
+    --font: "Pretendard Variable", Pretendard, "Segoe UI Variable Text", "Segoe UI", "Malgun Gothic",
+            "Apple SD Gothic Neo", system-ui, sans-serif;
+    --mono: "Cascadia Mono", "JetBrains Mono", Consolas, "Malgun Gothic", monospace;
+
+    /* 글자 크기 — 화면 전체가 이 다섯 단계만 쓴다. 그 위(--fs-num-*)는 큰 숫자 강조용 */
+    --fs-2xs: 11px;   /* 작은 뱃지 · 눈금 · 개수 */
+    --fs-xs:  12px;   /* 보조 설명 · 칩 · 태그 */
+    --fs-sm:  13px;   /* 카드 본문 · 목록 */
+    --fs-md:  14px;   /* 기본 본문 · 제목 */
+    --fs-lg:  15px;   /* 강조 제목 */
+    --fs-num-sm: 17px;
+    --fs-num-md: 19px;
+    --fs-num-lg: 24px;
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --lh-tight: 1.35;
+    --lh-body: 1.6;
+    --lh-read: 1.7;   /* AI 서술처럼 긴 글 */
+
+    /* ── 간격 (4px 단위) ──────────────────────────────────────────────────── */
+    --sp-1: 2px;
+    --sp-2: 4px;
+    --sp-3: 6px;
+    --sp-4: 8px;
+    --sp-5: 10px;
+    --sp-6: 12px;
+    --sp-7: 14px;
+    --sp-8: 16px;
+    --sp-10: 20px;
+    --sp-12: 24px;
+
+    /* ── 컨트롤 높이 — 누를 곳은 24px 이상(WCAG 2.5.8) ────────────────────── */
+    --h-xs: 24px;   /* 작은 버튼 · 칩 · 카드 안 동작 */
+    --h-sm: 28px;   /* 필터 칩 · 떠 있는 버튼 */
+    --h-md: 32px;   /* 기본 버튼 · 입력 */
+    --h-lg: 38px;   /* 모달 · 주요 동작 */
+
+    /* ── 모서리 ───────────────────────────────────────────────────────────── */
+    --r-2xs: 4px;    /* 코드 · 키 */
+    --r-xs: 6px;     /* 작은 버튼 · 표 행 */
+    --r-sm: 8px;     /* 버튼 · 입력 · 작은 카드 */
+    --r: 12px;       /* 카드 */
+    --r-lg: 16px;    /* 큰 패널 · 모달 · 떠 있는 카드 */
+    --r-pill: 999px; /* 칩 · 태그 · 떠 있는 버튼 */
+
+    /* ── 바탕 · 면 ────────────────────────────────────────────────────────── */
+    --bg:        #e9ecf1;
+    --scene:     #edf0f4;   /* 3D 뷰 바탕 */
+    --panel:     #f6f7f9;   /* 패널 바탕 */
+    --surface:   #ffffff;   /* 카드 */
+    --surface-2: #f4f6f9;   /* 카드 안 옅은 면 · 입력 */
+    --surface-3: #eaedf2;   /* 누르는 면의 바탕 · 세그먼트 트랙 */
+    --border:    #e2e6ec;
+    --border-2:  #d3d9e1;   /* 호버 · 점선 */
+    --track:     #dfe4eb;   /* 슬라이더 · 진행 막대 바탕 */
+
+    /* 3D 위에 떠 있는 유리 면 */
+    --glass:        rgba(255, 255, 255, .86);
+    --glass-strong: rgba(255, 255, 255, .92);
+    --glass-edge:   rgba(255, 255, 255, .95);
+    --glass-blur:   blur(12px);
+
+    /* ── 글자 ─────────────────────────────────────────────────────────────── */
+    --text:   #172031;
+    --text-2: #4f5d70;
+    --text-3: #5f6a79;      /* 보조 — 흰 바탕에서도 4.5:1 이상 */
+    --on-tone: #ffffff;     /* 채운 역할색 위 글자 */
+
+    /* ── 역할 색 — 색은 의미에만 쓴다 ─────────────────────────────────────────
+       accent 현재 · 선택 · 주요 동작 / pin 핀 · Design Commit / before A(이전) 시점
+       add 추가 / del 삭제 · 되돌릴 수 없는 동작 / mod 수정 · 주의 / rec 녹음
+       spa 공간적 영향(AI 세 항목의 둘째) / ok 검산 일치
+       각 역할은 base · 2(진하게, 호버) · soft(옅은 바탕) · ink(soft 위 글자) 네 벌 */
+    --accent:      #2563eb;
+    --accent-2:    #1d4ed8;
+    --accent-soft: #e9f0fe;
+    --accent-ink:  #1d4ed8;
+    --accent-ring: rgba(37, 99, 235, .28);
+
+    --pin:      #7c5cff;
+    --pin-2:    #6844f0;
+    --pin-soft: #f0ecff;
+    --pin-ink:  #5536d6;
+    --pin-line: #cfc5fb;    /* 핀 줄기 · 핀 카드 호버 테두리 */
+
+    --before:      #e8890c;
+    --before-soft: #fff4e5;
+    --before-ink:  #a85d00;
+
+    --add: #157a36;  --add-2: #116a2e;  --add-soft: #e8f6ed;  --add-ink: #157a36;
+    --del: #c81e1e;  --del-2: #a91818;  --del-soft: #fdeded;  --del-ink: #b91c1c;
+    --mod: #b45309;  --mod-2: #92400e;  --mod-soft: #fdf3e3;  --mod-ink: #92400e;
+    --rec: #ef4444;  --rec-2: #dc2626;  --rec-soft: #fdeded;  --rec-ink: #b91c1c;
+    --spa: #0d9488;  --spa-2: #0f766e;  --spa-soft: #e3f5f2;  --spa-ink: #0f766e;
+
+    /* 3D 렌더 · 평면 캡처에서 변경 요소를 칠하는 색(aiSummary.js · shoot.js 와 같은 값) */
+    --paint-add: #22c55e;
+    --paint-mod: #f59e0b;
+    --paint-del: #ef4444;
+
+    /* ── 카테고리 색 — store.js CATEGORIES 와 같은 값(차트는 JS 쪽 값을 쓴다) ── */
+    --cat-walls: #3b82f6;
+    --cat-curtain-walls: #06b6d4;
+    --cat-floors: #f59e0b;
+    --cat-ceilings: #94a3b8;
+    --cat-roofs: #ef4444;
+    --cat-columns: #a855f7;
+    --cat-structural-columns: #ec4899;
+    --cat-stairs: #10b981;
+    --cat-railings: #84cc16;
+    --cat-windows: #0ea5e9;
+    --cat-doors: #f97316;
+    --cat-furniture: #eab308;
+
+    /* ── 그림자 ───────────────────────────────────────────────────────────── */
+    --sh-xs:    0 1px 2px rgba(16, 24, 40, .06);
+    --sh-sm:    0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+    --sh-md:    0 10px 24px -8px rgba(16, 24, 40, .16), 0 2px 6px rgba(16, 24, 40, .05);
+    --sh-float: 0 16px 40px -12px rgba(16, 24, 40, .28);
+    --sh-glass: 0 1px 2px rgba(16, 24, 40, .08), 0 4px 14px -6px rgba(16, 24, 40, .18);
+    --ring:     0 0 0 3px var(--accent-ring);   /* 키보드 초점 · 입력 초점 */
+
+    /* ── 움직임 ───────────────────────────────────────────────────────────── */
+    --ease: cubic-bezier(.32, .72, 0, 1);       /* 들어올 때 — Apple 시트와 같은 결 */
+    --ease-out: cubic-bezier(.4, 0, .2, 1);     /* 나갈 때 — 짧고 단호하게 */
+    --spring: cubic-bezier(.34, 1.4, .64, 1);   /* 살짝 튕기는 선택 */
+    --dur-fast: .15s;    /* 색 · 테두리 */
+    --dur: .22s;         /* 작은 이동 · 나타남 */
+    --dur-slow: .46s;    /* 패널 · 레이아웃 */
+
+    /* ── 쌓임 순서 ────────────────────────────────────────────────────────── */
+    --z-float: 12;       /* 3D 위 카드(브리핑) */
+    --z-overlay: 40;     /* 이력 화면 */
+    --z-handle: 61;      /* 패널 손잡이 */
+    --z-pop: 90;         /* 떠 있는 메뉴 */
+    --z-modal: 1002;
+    --z-tip: 2000;
+
+    /* 타임라인 슬라이더 손잡이 */
+    --thumb: 18px;
+}
+
+/* ── 역할(톤) — 컴포넌트에 역할 색을 입힌다 ────────────────────────────────────
+   <span class="tag tone-add">추가</span>, <button class="btn btn--soft tone-pin"> 처럼 쓴다.
+   컴포넌트는 --tone · --tone-2 · --tone-soft · --tone-ink 만 읽으므로, 새 역할은 여기 한 줄로 늘린다.
+   톤을 주지 않으면 각 컴포넌트의 기본값(대개 accent 또는 중립 회색)을 쓴다. 톤은 상속된다. */
+.tone-neutral { --tone: var(--text-2); --tone-2: var(--text); --tone-soft: var(--surface-3); --tone-ink: var(--text-2); }
+.tone-accent { --tone: var(--accent); --tone-2: var(--accent-2); --tone-soft: var(--accent-soft); --tone-ink: var(--accent-ink); }
+.tone-pin    { --tone: var(--pin);    --tone-2: var(--pin-2);    --tone-soft: var(--pin-soft);    --tone-ink: var(--pin-ink); }
+.tone-before { --tone: var(--before); --tone-2: var(--before-ink); --tone-soft: var(--before-soft); --tone-ink: var(--before-ink); }
+.tone-add    { --tone: var(--add);    --tone-2: var(--add-2);    --tone-soft: var(--add-soft);    --tone-ink: var(--add-ink); }
+.tone-del    { --tone: var(--del);    --tone-2: var(--del-2);    --tone-soft: var(--del-soft);    --tone-ink: var(--del-ink); }
+.tone-mod    { --tone: var(--mod);    --tone-2: var(--mod-2);    --tone-soft: var(--mod-soft);    --tone-ink: var(--mod-ink); }
+.tone-rec    { --tone: var(--rec);    --tone-2: var(--rec-2);    --tone-soft: var(--rec-soft);    --tone-ink: var(--rec-ink); }
+.tone-spa    { --tone: var(--spa);    --tone-2: var(--spa-2);    --tone-soft: var(--spa-soft);    --tone-ink: var(--spa-ink); }

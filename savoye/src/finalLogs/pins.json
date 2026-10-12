@@ -1,0 +1,222 @@
+[
+  {
+    "Id": "pin_20260921090742_0337",
+    "Timestamp": "2026_09_21_09_07_42",
+    "Title": "레벨 네 개",
+    "Note": "공표 높이 9.4 m 를 지상층 3.1(슬래브 하단) + 슬래브 0.3 + 1층 상자 3.4 + 솔라리움 벽 2.6 으로 나눴다. 출입구 쪽을 y 0 으로 둔다.",
+    "Stage": "기획",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260921090856_9ff4",
+    "Timestamp": "2026_09_21_09_08_56",
+    "Title": "필로티 5 × 5",
+    "Note": "첫 번째 원칙. 4.75 m 그리드 25개를 먼저 세우고 모든 것을 여기에 맞춘다. 1928년 말 5 m 에서 줄인 치수.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260921091414_5d66",
+    "Timestamp": "2026_09_21_09_14_14",
+    "Title": "지상층 외피 — 차의 회전 반경",
+    "Note": "반원(반지름 6.25 m)은 차가 필로티 아래를 돌아 차고로 들어가는 궤적이다. 유리는 홀, 사선부터는 녹색 벽으로 차고를 감춘다.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260921091842_98e3",
+    "Timestamp": "2026_09_21_09_18_42",
+    "Title": "지상층 실 구성",
+    "Note": "홀 가운데 경사로를 비우고, 왼쪽에 세탁실 · 하녀방 둘, 오른쪽에 차고(3대)와 운전기사 방.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260921092649_f895",
+    "Timestamp": "2026_09_21_09_26_49",
+    "Title": "경사로 — 건축적 산책",
+    "Note": "경사로는 경사 바닥 두 장으로. 애드인이 Ramp 를 추적하지 않아서다. 폭 2.3 m, 구간 8 m 에 1.7 m 씩 올라 1층 살롱 앞에 닿는다.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260921092925_48d6",
+    "Timestamp": "2026_09_21_09_29_25",
+    "Title": "나선 계단",
+    "Note": "홀 가운데서 눈에 띄는 U 자 계단. 반원 계단참으로 나선을 흉내 낸다.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922092528_db2b",
+    "Timestamp": "2026_09_22_09_25_28",
+    "Title": "1층 슬래브 — 캔틸레버",
+    "Note": "19 × 21.5 m 판을 필로티 밖으로 1.25 m 내민다. 경사로와 계단 자리는 구멍.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922092705_1c32",
+    "Timestamp": "2026_09_22_09_27_05",
+    "Title": "필로티를 지붕까지",
+    "Note": "기둥이 1층 벽과 무관하게 올라간다 — 자유로운 평면 · 자유로운 입면.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922092953_f7c5",
+    "Timestamp": "2026_09_22_09_29_53",
+    "Title": "1층 상자",
+    "Note": "백색 외벽 네 면, 기둥에서 물러난 자유 입면. 높이 3.4 m.",
+    "Stage": "계획설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922093222_28f1",
+    "Timestamp": "2026_09_22_09_32_22",
+    "Title": "띠창 — 네 면 전체",
+    "Note": "모서리 0.5 m 만 남기고 창턱 0.8, 높이 1.2 m 로 두른다. 테라스 쪽 면도 같은 띠로 비워 입면이 하나로 읽히게. 테라스 쪽은 일단 같은 유리창 타입.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922093631_58fa",
+    "Timestamp": "2026_09_22_09_36_31",
+    "Title": "살롱과 테라스",
+    "Note": "살롱 6 × 14 m 는 입구 쪽 전면을 차지하고 테라스로 전면 유리 미닫이가 열린다. 주방은 왼쪽.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922093952_c750",
+    "Timestamp": "2026_09_22_09_39_52",
+    "Title": "1층 실 구성",
+    "Note": "안방 · 욕실 왼쪽 위, 손님방 왼쪽, 아들 방 테라스 위쪽. 경사로를 벽으로 감싸 복도를 만든다.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260922094400_90a5",
+    "Timestamp": "2026_09_22_09_44_00",
+    "Title": "아들 방 0.7 m 확장",
+    "Note": "방 폭 3.6 m 가 침대 둘에 빠듯해서 테라스 쪽으로 0.7 m 내밀었다. 테라스 모서리 ABRI 가 그만큼 줄어든다.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260923100802_6f9e",
+    "Timestamp": "2026_09_23_10_08_02",
+    "Title": "경사로 3 · 4 — 실외로",
+    "Note": "1층부터 경사로는 바깥이다. 같은 자리에서 옥상까지 이어 산책이 하늘에서 끝나게.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260923101036_9f61",
+    "Timestamp": "2026_09_23_10_10_36",
+    "Title": "옥상 정원",
+    "Note": "다섯 번째 원칙. 테라스 위는 비우고(VIDE) 나머지에 옥상 슬래브. 경사로 · 계단 구멍은 그대로.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260923101252_f888",
+    "Timestamp": "2026_09_23_10_12_52",
+    "Title": "솔라리움 — 조각 같은 곡면",
+    "Note": "큰 호(반지름 3.3 m)가 양지바른 방을 감싸고 작은 호(2.6 m)가 맞은편에서 답한다. 높이 2.6 m 로 멀리서 흰 상자 위에 조각처럼 보이게.",
+    "Stage": "기본설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260923101754_a3b7",
+    "Timestamp": "2026_09_23_10_17_54",
+    "Title": "솔라리움 호 3.3 → 3.6 m",
+    "Note": "앉는 자리가 좁아 보여 호를 0.3 m 키웠다. 직선 벽은 그대로라 끝이 조금 어긋나는 건 다음에 손본다.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260923102033_4617",
+    "Timestamp": "2026_09_23_10_20_33",
+    "Title": "테라스 띠는 유리 없이",
+    "Note": "테라스를 감싼 두 면의 띠는 창이 아니라 빈 개구부다. 살롱 · 침실 앞은 유리창 그대로. 타입만 바꿨으므로 요소 id 는 그대로.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260924094325_dd34",
+    "Timestamp": "2026_09_24_09_43_25",
+    "Title": "솔라리움 벽 끝 맞춤",
+    "Note": "어제 키운 호에 직선 벽 두 장의 끝점을 다시 붙였다.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260924094629_05f0",
+    "Timestamp": "2026_09_24_09_46_29",
+    "Title": "파라펫 0.9 m",
+    "Note": "옥상 가장자리에 난간 대신 벽을 올렸다. 사진의 흰 상자는 지붕 슬래브 위로 이어진다. 외벽 네 장의 높이가 바뀌니 거기 박힌 띠창도 수정으로 잡힌다.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260924094733_7938",
+    "Timestamp": "2026_09_24_09_47_33",
+    "Title": "옥상 난간 둘 삭제",
+    "Note": "파라펫이 생겨 북 · 서쪽 가장자리 난간은 필요 없다.",
+    "Stage": "검토",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  },
+  {
+    "Id": "pin_20260924095951_1a58",
+    "Timestamp": "2026_09_24_09_59_51",
+    "Title": "천장 여섯 장",
+    "Note": "홀은 2.8 m, 1층 실들은 3.0 m 에 석고보드 천장. 테라스 · 솔라리움 · 경사로 위는 하늘이라 천장이 없다.",
+    "Stage": "실시설계",
+    "Author": "Claude",
+    "Document": "VillaSavoye",
+    "Saved": true
+  }
+]

@@ -1,0 +1,374 @@
+/* ============================================================================
+   Augmented BIM Log — 공통 컴포넌트 (ui.css)
+
+   모든 화면이 같이 쓰는 부품. 값은 tokens.css 의 변수만 쓴다.
+   화면 CSS(style.css · history.css · compare-split.css)는 배치(자리 · 간격 · 그리드)만 맡고,
+   버튼 · 칩 · 태그 · 카드 · 입력 · 세그먼트 · 스위치 · 펼침 · 알림 · 스피너 · 메뉴의
+   "생김새"는 여기 것을 쓴다. 화면 고유의 클래스(rate__btn 등)는 JS 가 찾는 이름표로 남기고
+   생김새는 이 부품 클래스를 함께 붙여 얻는다:  <button class="btn btn--xs rate__btn">
+
+   역할 색은 tone-* 클래스(tokens.css)로 입힌다. 부품은 --tone · --tone-2 · --tone-soft ·
+   --tone-ink 를 읽고, 톤이 없으면 각 부품의 기본값(대개 accent 또는 중립)을 쓴다.
+   톤은 상속되므로 카드에 tone-pin 을 주면 그 안의 버튼 호버 · 칩 선택도 핀 색이 된다.
+
+   목록 · 쓰는 법 · 하지 말 것: docs/DESIGN-SYSTEM.md   ·   한 화면에서 보기: ui-gallery.html
+   ============================================================================ */
+
+/* ── 바탕 ─────────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+button { font-family: inherit; color: inherit; -webkit-user-select: none; user-select: none; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+[tabindex]:focus-visible, summary:focus-visible, a:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+}
+[hidden] { display: none !important; }
+.ico { flex: none; display: block; }
+.ico--flip { transform: rotate(180deg); }
+
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #cfd6df; border-radius: var(--r-sm); border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: #b7c1ce; background-clip: content-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+}
+
+/* 숫자는 자릿수가 흔들리지 않게 */
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* 변화 숫자 글자색 — +추가 · −삭제 · ~수정 */
+.is-add { color: var(--add); }
+.is-del { color: var(--del); }
+.is-mod { color: var(--mod); }
+
+/* 점 — 카테고리 · 역할 표시. --c 로 색 */
+.dot { flex: none; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--tone, var(--text-3))); }
+.dot--sm { width: 7px; height: 7px; }
+
+/* ── 버튼 ─────────────────────────────────────────────────────────────────────
+   크기  기본 32 · --sm 28 · --xs 24 · --lg 38     모양  기본 모서리 8 · --pill 알약 · --icon 정사각
+   종류  기본(흰 면 + 테두리) · --primary(역할색 채움) · --soft(옅은 역할색) · --ghost(바탕 없음)
+   상태  .is-on(켜진 토글) · :disabled / .is-disabled                                         */
+.btn {
+    --btn-h: var(--h-md);
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-3);
+    height: var(--btn-h); min-width: 0; padding: 0 var(--sp-6);
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    background: var(--surface); color: var(--text);
+    font: var(--fw-semibold) var(--fs-sm) / 1 var(--font);
+    white-space: nowrap; text-decoration: none; cursor: pointer;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease,
+                box-shadow var(--dur-fast) ease, transform .1s ease;
+}
+.btn:hover:not(:disabled):not(.is-disabled) { background: var(--surface-2); border-color: var(--border-2); }
+.btn:active:not(:disabled):not(.is-disabled) { transform: scale(.97); }
+.btn:disabled, .btn.is-disabled { opacity: .5; cursor: default; }
+
+.btn--xs { --btn-h: var(--h-xs); padding: 0 var(--sp-4); gap: var(--sp-2); font-size: var(--fs-xs); border-radius: var(--r-xs); }
+.btn--sm { --btn-h: var(--h-sm); padding: 0 var(--sp-5); gap: var(--sp-2); }
+.btn--lg { --btn-h: var(--h-lg); padding: 0 var(--sp-8); font-size: var(--fs-md); }
+.btn--pill { border-radius: var(--r-pill); }
+.btn--icon { width: var(--btn-h); padding: 0; }
+.btn--block { width: 100%; }
+
+.btn--primary { background: var(--tone, var(--accent)); border-color: var(--tone, var(--accent)); color: var(--on-tone); }
+.btn--primary:hover:not(:disabled):not(.is-disabled) { background: var(--tone-2, var(--accent-2)); border-color: var(--tone-2, var(--accent-2)); }
+
+.btn--soft { background: var(--tone-soft, var(--accent-soft)); border-color: transparent; color: var(--tone-ink, var(--accent-ink)); }
+.btn--soft:hover:not(:disabled):not(.is-disabled) {
+    background: color-mix(in srgb, var(--tone, var(--accent)) 16%, var(--surface));
+    border-color: transparent;
+}
+
+.btn--ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.btn--ghost:hover:not(:disabled):not(.is-disabled) { background: var(--tone-soft, var(--surface-3)); border-color: transparent; color: var(--tone-ink, var(--text)); }
+
+.btn.is-on { background: var(--tone-soft, var(--accent-soft)); border-color: color-mix(in srgb, var(--tone, var(--accent)) 45%, transparent); color: var(--tone-ink, var(--accent-ink)); }
+.btn[aria-pressed="true"] { background: var(--tone-soft, var(--accent-soft)); border-color: color-mix(in srgb, var(--tone, var(--accent)) 45%, transparent); color: var(--tone-ink, var(--accent-ink)); }
+.btn--ghost.is-on { border-color: transparent; }
+.btn--primary.is-on { background: var(--tone-2, var(--accent-2)); color: var(--on-tone); }
+
+/* 카드 위 한구석의 작은 아이콘 버튼 — 카드에 마우스를 올리면 나타난다(.reveal-on-hover 부모 안에서) */
+.reveal-on-hover .btn--reveal { opacity: 0; }
+.reveal-on-hover:hover .btn--reveal, .btn--reveal:focus-visible { opacity: 1; }
+
+/* ── 칩 — 고르는 · 거르는 · 세는 알약 ─────────────────────────────────────────
+   크기  기본 28 · --sm 24      점  --dot(앞에 --c 색 점)      상태  .is-on(선택) · .is-off(숨김)
+   <b class="chip__n"> 는 숫자.  button.chip 만 누를 수 있게 보인다.                               */
+.chip {
+    --chip-h: var(--h-sm);
+    display: inline-flex; align-items: center; gap: var(--sp-3);
+    height: var(--chip-h); min-width: 0; padding: 0 var(--sp-5);
+    border: 1px solid var(--border); border-radius: var(--r-pill);
+    background: var(--surface); color: var(--text-2);
+    font: var(--fw-semibold) var(--fs-sm) / 1 var(--font);
+    white-space: nowrap;
+}
+.chip--sm { --chip-h: var(--h-xs); padding: 0 var(--sp-4); gap: var(--sp-2); font-size: var(--fs-xs); }
+.chip--quiet { background: var(--surface-2); }
+button.chip, a.chip, .chip[role="button"] {
+    cursor: pointer; text-decoration: none;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+button.chip:hover:not(:disabled), a.chip:hover, .chip[role="button"]:hover { border-color: var(--tone, var(--border-2)); color: var(--tone-ink, var(--text)); }
+.chip--dot::before {
+    content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--c, var(--text-3)); box-shadow: inset 0 0 0 2px var(--c, var(--text-3));
+    transition: background var(--dur-fast) ease;
+}
+.chip.is-on { background: var(--tone-soft, var(--accent-soft)); border-color: var(--tone, var(--accent)); color: var(--tone-ink, var(--accent-ink)); }
+.chip.is-off { background: transparent; border-style: dashed; color: var(--text-3); }
+.chip--dot.is-off::before { background: transparent; }
+.chip--more { border-style: dashed; color: var(--text-3); }
+.chip__n { font: var(--fw-bold) var(--fs-xs) var(--mono); font-variant-numeric: tabular-nums; color: var(--tone-ink, var(--text)); }
+.chip__x { margin-right: calc(-1 * var(--sp-2)); display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; color: var(--text-3); }
+.chip__x:hover { background: var(--surface-3); color: var(--text); }
+
+/* ── 태그 — 누르지 않는 짧은 표시(단계 · 상태 · 개수) ──────────────────────────
+   기본 20px 옅은 역할색 · --md 22px · --solid 채움 · --line 테두리 · --num 숫자(모노)        */
+.tag {
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    height: 20px; padding: 0 7px;
+    border-radius: var(--r-pill);
+    background: var(--tone-soft, var(--surface-3)); color: var(--tone-ink, var(--text-2));
+    font: var(--fw-semibold) var(--fs-2xs) / 1 var(--font);
+    white-space: nowrap; flex: none;
+}
+.tag--md { height: 22px; padding: 0 var(--sp-4); font-size: var(--fs-xs); }
+.tag--solid { background: var(--tone, var(--text-2)); color: var(--on-tone); }
+.tag--line { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
+.tag--num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* 둥근 번호(핀 순서 등) */
+.num-dot {
+    flex: none; display: inline-grid; place-items: center;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--tone, var(--pin)); color: var(--on-tone);
+    font: var(--fw-bold) var(--fs-2xs) / 1 var(--font);
+}
+.num-dot--soft { background: var(--tone-soft, var(--pin-soft)); color: var(--tone-ink, var(--pin-ink)); }
+
+/* ── 카드 ─────────────────────────────────────────────────────────────────── */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--sh-xs);
+}
+.card--pad { padding: var(--sp-5) var(--sp-6); }
+.card--flat { box-shadow: none; }
+.card--sunken { background: var(--surface-2); box-shadow: none; }
+.card--hover { transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease; }
+.card--hover:hover { border-color: var(--tone, var(--border-2)); box-shadow: var(--sh-sm); }
+.card.is-selected { border-color: var(--tone, var(--accent)); box-shadow: 0 0 0 3px var(--tone-soft, var(--accent-soft)); }
+
+/* 3D 위에 떠 있는 유리 면 */
+.glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--sh-glass);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* ── 입력 — input · select · textarea 모두 .field ──────────────────────────── */
+.field {
+    height: var(--h-md); min-width: 0; padding: 0 var(--sp-5);
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    background: var(--surface-2); color: var(--text);
+    font: var(--fw-medium) var(--fs-sm) var(--font);
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.field:hover { border-color: var(--border-2); }
+.field:focus, .field:focus-visible {
+    outline: none;
+    border-color: var(--tone, var(--accent));
+    background: var(--surface);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone, var(--accent)) 24%, transparent);
+}
+.field::placeholder { color: var(--text-3); opacity: .85; }
+.field--sm { height: var(--h-sm); font-size: var(--fs-xs); }
+.field--lg { height: var(--h-lg); font-size: var(--fs-md); }
+.field--mono { font-family: var(--mono); }
+.field--block { width: 100%; }
+textarea.field { height: auto; padding: var(--sp-4) var(--sp-5); line-height: var(--lh-body); resize: vertical; }
+select.field {
+    appearance: none; -webkit-appearance: none;
+    padding-right: 26px; text-overflow: ellipsis; cursor: pointer;
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235f6a79' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+}
+.field--pill { border-radius: var(--r-pill); padding-left: var(--sp-6); }
+select.field.is-on { border-color: var(--tone, var(--accent)); color: var(--tone-ink, var(--accent-ink)); background-color: var(--tone-soft, var(--accent-soft)); }
+
+/* 아이콘이 앞에 붙는 입력(검색) */
+.field-icon { position: relative; display: flex; align-items: center; min-width: 0; }
+.field-icon > .ico { position: absolute; left: 9px; color: var(--text-3); pointer-events: none; }
+.field-icon > .field { flex: 1; padding-left: 28px; }
+
+/* 입력 + 버튼 한 줄(API 키 등) */
+.field-row { display: flex; gap: var(--sp-3); min-width: 0; }
+.field-row > .field { flex: 1; }
+
+/* 체크박스 한 줄 */
+.check { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--h-xs); font-size: var(--fs-xs); color: var(--text-2); cursor: pointer; }
+.check input { margin: 0; accent-color: var(--tone, var(--accent)); }
+
+/* ── 세그먼트 — 둘 이상 중 하나 고르기(보기 전환 · 범위) ──────────────────────── */
+.seg {
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    padding: var(--sp-1); border-radius: var(--r-pill);
+    background: var(--surface-3);
+    max-width: 100%;
+}
+.seg__btn, .seg > button {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    height: var(--h-xs); min-width: 0; padding: 0 var(--sp-5);
+    border: 0; border-radius: var(--r-pill);
+    background: transparent; color: var(--text-2);
+    font: var(--fw-semibold) var(--fs-sm) / 1 var(--font);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background var(--dur) var(--ease), color var(--dur-fast) ease, box-shadow var(--dur) var(--ease);
+}
+.seg__btn:hover, .seg > button:hover { color: var(--text); }
+.seg__btn.is-on, .seg > button.is-on { background: var(--surface); color: var(--tone-ink, var(--accent-ink)); box-shadow: var(--sh-sm); }
+.seg--sm .seg__btn { padding: 0 var(--sp-4); font-size: var(--fs-xs); max-width: 150px; }
+.seg--block { display: flex; }
+.seg--block .seg__btn { flex: 1; }
+
+/* ── 스위치 — 켜고 끄기 ─────────────────────────────────────────────────────
+   <label class="switch-row"><span>이름</span><span class="switch"><input type="checkbox"><i class="switch__track"></i></span></label> */
+.switch { position: relative; display: inline-block; flex: none; width: 36px; height: 20px; }
+.switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.switch__track {
+    position: absolute; inset: 0; border-radius: var(--r-pill);
+    background: var(--border-2);
+    transition: background var(--dur) ease, box-shadow var(--dur-fast) ease;
+}
+.switch__track::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--surface); box-shadow: var(--sh-sm);
+    transition: transform var(--dur) var(--ease);
+}
+.switch input:checked + .switch__track { background: var(--tone, var(--accent)); }
+.switch input:checked + .switch__track::after { transform: translateX(16px); }
+.switch input:focus-visible + .switch__track { box-shadow: var(--ring); }
+.switch-row { display: inline-flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--text-2); cursor: pointer; white-space: nowrap; }
+
+/* ── 펼침 — <details class="disc"> ─────────────────────────────────────────────
+   summary 첫 아이콘(chevronRight)이 펼치면 90° 돈다. summary 끝의 <em> 은 오른쪽 요약값.
+   --rule 위 점선 · --xs 작은 글자                                                        */
+.disc > summary {
+    display: flex; align-items: center; gap: var(--sp-2);
+    min-height: var(--h-xs); padding: var(--sp-1) 0;
+    list-style: none; cursor: pointer;
+    font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--text-2);
+}
+.disc > summary::-webkit-details-marker { display: none; }
+.disc > summary > .ico:first-child { color: var(--text-3); transition: transform var(--dur) var(--ease); }
+.disc[open] > summary > .ico:first-child { transform: rotate(90deg); }
+.disc > summary:hover { color: var(--text); }
+.disc > summary em { margin-left: auto; font-style: normal; font-weight: var(--fw-medium); font-size: var(--fs-xs); color: var(--text-3); }
+.disc--xs > summary { font-size: var(--fs-xs); }
+.disc--rule { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px dashed var(--border); }
+.disc--line { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid var(--border); }
+
+/* ── 알림 한 줄 — 상태 · 주의 · 오류 ─────────────────────────────────────────── */
+.notice {
+    display: flex; align-items: flex-start; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5); border-radius: var(--r-sm);
+    background: var(--tone-soft, var(--surface-3)); color: var(--tone-ink, var(--text-2));
+    font-size: var(--fs-sm); line-height: 1.5;
+}
+.notice > .ico { flex: none; margin-top: 2px; color: var(--tone, currentColor); }
+.notice--plain { padding: 0; background: transparent; }
+.notice--xs { font-size: var(--fs-xs); }
+
+/* ── 진행 중 ──────────────────────────────────────────────────────────────── */
+.spinner {
+    flex: none; display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--tone-soft, var(--accent-soft)); border-top-color: var(--tone, var(--accent));
+    animation: spin .8s linear infinite;
+}
+.spinner--lg { width: 34px; height: 34px; border-width: 3px; border-color: var(--track); border-top-color: var(--tone, var(--accent)); }
+.busy { display: flex; align-items: center; gap: var(--sp-4); color: var(--text-2); font-size: var(--fs-sm); }
+
+/* ── 메뉴 — 버튼을 누르면 뜨는 목록 ─────────────────────────────────────────── */
+.menu {
+    padding: var(--sp-3); border-radius: var(--r);
+    background: var(--surface); border: 1px solid var(--border);
+    box-shadow: var(--sh-float);
+    animation: rise .18s var(--ease);
+}
+.menu__head { padding: var(--sp-2) var(--sp-4) var(--sp-3); font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-3); }
+.menu__item {
+    display: flex; align-items: center; gap: var(--sp-4);
+    width: 100%; min-height: var(--h-md); padding: var(--sp-2) var(--sp-4);
+    border: 0; border-radius: var(--r-sm); background: transparent;
+    color: var(--text); font: var(--fw-medium) var(--fs-sm) var(--font); text-align: left;
+    cursor: pointer; transition: background var(--dur-fast) ease;
+}
+.menu__item:hover, .menu__item:focus-visible { background: var(--surface-2); box-shadow: none; }
+.menu__item.is-on { background: var(--tone-soft, var(--accent-soft)); color: var(--tone-ink, var(--accent-ink)); }
+.menu__item > .ico { color: var(--text-3); }
+.menu__sep { margin: var(--sp-2) var(--sp-3); border: 0; border-top: 1px solid var(--border); }
+.menu__foot { margin-top: var(--sp-2); padding: var(--sp-3) var(--sp-4) var(--sp-1); border-top: 1px solid var(--border); font-size: var(--fs-2xs); color: var(--text-3); }
+
+/* ── 섹션 머리 ────────────────────────────────────────────────────────────── */
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); margin: var(--sp-7) var(--sp-1) var(--sp-4); }
+.sec-head:first-child { margin-top: var(--sp-2); }
+.sec-head--flush { margin: var(--sp-2) var(--sp-1) var(--sp-5); }
+.sec-head--center { align-items: center; }
+.sec-head h3 { margin: 0; font-size: var(--fs-md); font-weight: var(--fw-bold); letter-spacing: -.01em; }
+.sec-sub { font-size: var(--fs-sm); color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── 값 하나(이름 + 큰 숫자) ──────────────────────────────────────────────── */
+.metric { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.metric > span { font-size: var(--fs-xs); color: var(--text-3); }
+.metric > b { font: var(--fw-bold) var(--fs-num-sm) var(--mono); letter-spacing: -.02em; color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* ── 표 ───────────────────────────────────────────────────────────────────── */
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.tbl th { padding: var(--sp-3) var(--sp-4); text-align: left; white-space: nowrap; font-weight: var(--fw-semibold); color: var(--text-3); border-bottom: 1px solid var(--border); }
+.tbl td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); color: var(--text); }
+.tbl .n, .tbl td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.tbl--xs { font-size: var(--fs-xs); }
+.tbl--xs th, .tbl--xs td { padding: 3px 5px; }
+.tbl--xs th { background: var(--surface-2); }
+
+/* ── 비어 있음 ────────────────────────────────────────────────────────────── */
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 42px 22px; }
+.empty__icon {
+    width: 48px; height: 48px; border-radius: var(--r-lg);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--tone-soft, var(--surface-3)); color: var(--tone, var(--text-2)); margin-bottom: var(--sp-7);
+}
+.empty__title { font-size: var(--fs-lg); font-weight: var(--fw-bold); margin-bottom: var(--sp-3); }
+.empty__text { margin: 0; font-size: var(--fs-md); line-height: 1.65; color: var(--text-2); }
+.empty--inline { padding: 18px; font-size: var(--fs-md); color: var(--text-3); }
+
+/* ── 키 표시 ──────────────────────────────────────────────────────────────── */
+.kbd, kbd {
+    display: inline-block; padding: 0 5px; border-radius: var(--r-2xs);
+    border: 1px solid var(--border-2); border-bottom-width: 2px;
+    background: var(--surface); font: var(--fw-semibold) var(--fs-xs) var(--mono); color: var(--text-2);
+}
+
+/* ── 툴팁(store.js showTip) ───────────────────────────────────────────────── */
+.abl-tip {
+    position: fixed; top: 0; left: 0; z-index: var(--z-tip);
+    max-width: 280px; padding: var(--sp-4) var(--sp-5);
+    border-radius: var(--r-sm);
+    background: #111827; color: #fff;
+    font-size: var(--fs-sm); line-height: 1.45;
+    box-shadow: var(--sh-float);
+    pointer-events: none; opacity: 0;
+    transition: opacity .12s ease;
+}
+.abl-tip.is-on { opacity: 1; }

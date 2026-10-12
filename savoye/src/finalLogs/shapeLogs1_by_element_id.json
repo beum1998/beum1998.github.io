@@ -1,0 +1,2797 @@
+﻿{
+  "355904_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355907_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355912_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355919_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355922_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355926_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355929_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355934_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355941_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355945_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355948_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355950_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355952_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355954_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355960_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355964_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355970_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355977_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355982_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355989_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355996_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356003_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356009_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356015_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356021_1": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 11.15485564304462,
+      "Column Volume": 7.393327987812401
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356027_1": {
+    "Layer": [
+      {
+        "Material Name": "타일 백색",
+        "Function": "Finish1",
+        "Material Volume": 252.14672039142846
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 2689.5650175085707
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "기초 슬래브 350"
+  },
+  "356032_1": {
+    "Layer": {},
+    "ElementCategory": "Curtain Walls",
+    "ElementFamily": "커튼월",
+    "ElementType": "홀 유리벽"
+  },
+  "356039_1": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 21.45719149997647
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 214.57191499976472
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 32.1857872499647
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356045_1": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 27.09517804206212
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 270.9517804206212
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 40.642767063093174
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356039_2": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 21.73088016706801
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 217.30880167068008
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 32.596320250602005
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356047_1": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 22.716159368597538
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 227.1615936859754
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 34.0742390528963
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356045_2": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 27.368866709153657
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 273.6886670915366
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 41.05330006373048
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356049_1": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 12.107787038644085
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 121.07787038644085
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 18.161680557966125
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356047_2": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 22.989848035689075
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 229.89848035689076
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 34.484772053533604
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356054_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "차고문",
+    "ElementType": "차고문 2600x2200"
+  },
+  "356049_2": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 8.067789165705792
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 80.67789165705791
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.101683748558685
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356056_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "고정창",
+    "ElementType": "창 900x1200"
+  },
+  "356039_3": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 20.968083365883853
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 209.68083365883854
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 31.452125048825774
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356059_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "고정창",
+    "ElementType": "창 900x1200"
+  },
+  "356039_4": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 20.2052865646997
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 202.05286564699702
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 30.307929847049547
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356062_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "고정창",
+    "ElementType": "차고 띠창 7000x1000"
+  },
+  "356045_3": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 22.42481336814525
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 224.24813368145252
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 33.63722005221787
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356069_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "고정창",
+    "ElementType": "창 900x1200"
+  },
+  "356047_3": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 22.22705123450492
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 222.2705123450492
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 33.340576851757376
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356073_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "고정창",
+    "ElementType": "창 900x1200"
+  },
+  "356047_4": {
+    "Layer": [
+      {
+        "Material Name": "녹색 도장",
+        "Function": "Finish1",
+        "Material Volume": 21.464254433320768
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 214.64254433320767
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 32.19638164998114
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 녹색 250"
+  },
+  "356080_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.887627124663698
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 95.3257627479822
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.887627124663698
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356087_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087967
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 35.125203534527806
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087967
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356093_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087967
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 35.125203534527806
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087967
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356098_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356080_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.997697523282188
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 89.98618513969313
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.997697523282188
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356100_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356080_3": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.107767921900674
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 84.64660753140404
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.107767921900674
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356105_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356080_4": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 13.217838320519162
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 79.30702992311497
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 13.217838320519162
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356107_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.887627124663698
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 95.3257627479822
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.887627124663698
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356109_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087965
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 35.125203534527785
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.854200589087965
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356111_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356107_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.997697523282188
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 89.98618513969313
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 14.997697523282188
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356115_1": {
+    "Layer": [
+      {
+        "Material Name": "시멘트 몰탈",
+        "Function": "Finish1",
+        "Material Volume": 6.642989194093148
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 53.14391355274518
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "경사로 180"
+  },
+  "356118_1": {
+    "Layer": [
+      {
+        "Material Name": "타일 백색",
+        "Function": "Finish1",
+        "Material Volume": 3.1677256049175235
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 28.509530444257713
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "슬래브 300"
+  },
+  "356122_1": {
+    "Layer": [
+      {
+        "Material Name": "시멘트 몰탈",
+        "Function": "Finish1",
+        "Material Volume": 6.642989194093151
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 53.14391355274521
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "경사로 180"
+  },
+  "356129_1": {
+    "Layer": {
+      "Railing Length": 26.246719160104988
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356132_1": {
+    "Layer": {
+      "Railing Length": 26.246719160104988
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356135_1": {
+    "Layer": {
+      "Stair Length": 22.471575272751448,
+      "Stair Run Length": 17.060367454068242,
+      "Stair Landing Length": 5.411207818683207,
+      "Stair Run Width": 3.1167979002624673,
+      "Stair Landing Thckness": 0.49212598425196846
+    },
+    "ElementCategory": "Stairs",
+    "ElementFamily": "조립 계단",
+    "ElementType": "콘크리트 U계단"
+  },
+  "356142_1": {
+    "Layer": {
+      "Railing Length": 8.530183727034121
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356144_1": {
+    "Layer": [
+      {
+        "Material Name": "타일 백색",
+        "Function": "Finish1",
+        "Material Volume": 403.2970254260718
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 3629.673228834646
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "슬래브 300"
+  },
+  "355904_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355907_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355912_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355919_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355922_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355926_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355929_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355934_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355941_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355945_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355948_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355950_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355952_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355954_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355960_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355964_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355970_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355977_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355982_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355989_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "355996_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356003_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356009_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356015_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356021_2": {
+    "Layer": {
+      "Column Material": "철근콘크리트",
+      "Column Length": 22.30971128608924,
+      "Column Volume": 14.786655975624802
+    },
+    "ElementCategory": "Structural Columns",
+    "ElementFamily": "콘크리트 원형 기둥",
+    "ElementType": "필로티 D280"
+  },
+  "356146_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 51.630042746816315
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 516.3004274681632
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 77.44506412022446
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356152_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 45.326374737030605
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 453.263747370306
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 67.98956210554589
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356146_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 51.93021741394897
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 519.3021741394897
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 77.89532612092344
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356158_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 51.329868079683656
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 513.2986807968366
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 76.99480211952547
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356152_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 45.62654940416325
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 456.26549404163256
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 68.43982410624487
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356161_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 45.02620006989795
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 450.26200069897953
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 67.53930010484692
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356146_3": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 52.230392081081625
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 522.3039208108163
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 78.34558812162243
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356158_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 51.630042746816315
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 516.3004274681632
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 77.44506412022446
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356163_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 18000x1200"
+  },
+  "356161_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 29.77026404621488
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 297.7026404621488
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 44.655396069322315
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356170_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 5300x1200"
+  },
+  "356158_3": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 47.13801713984297
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 471.3801713984297
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 70.70702570976444
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356174_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 14700x1200"
+  },
+  "356158_4": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 34.67900272050179
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 346.79002720501796
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 52.018504080752685
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356181_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 9700x1200"
+  },
+  "356152_3": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 37.405294991400716
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 374.0529499140072
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 56.10794248710106
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356186_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 7800x1200"
+  },
+  "356152_4": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 30.79438938113805
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 307.9438938113805
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 46.19158407170706
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356190_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 20500x1200"
+  },
+  "356146_4": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 34.85557605410924
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 348.55576054109247
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 52.28336408116385
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356193_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.433756406882891
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 26.602538441297344
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.433756406882891
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356198_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 19.63142323047551
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 196.31423230475508
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 29.447134845713254
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356201_1": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "유리 미닫이",
+    "ElementType": "테라스 미닫이 8200x2900"
+  },
+  "356198_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 2.989386537974009
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 29.89386537974009
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.484079806961013
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356204_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.041637195588477
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 60.24982317353086
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.041637195588477
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356193_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.5322843270358435
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 27.193705962215063
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.5322843270358435
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356209_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356204_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.151707594206965
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 54.91024556524179
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.151707594206965
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356213_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.83326159992215
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 76.99956959953289
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.83326159992215
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356219_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356213_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.943331998540637
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 71.65999199124383
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.943331998540637
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356223_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.271827623707738
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 91.63096574224643
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.271827623707738
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356230_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.271827623707738
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 91.63096574224643
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.271827623707738
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356236_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 3.5798477655572984
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 21.47908659334379
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 3.5798477655572984
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356223_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.370355543860693
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 92.22213326316415
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.370355543860693
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356230_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.370355543860693
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 92.22213326316415
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 15.370355543860693
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356238_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 24.656612018276526
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 147.93967210965917
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 24.656612018276526
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356193_3": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.630812247188796
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 27.784873483132777
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.630812247188796
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356198_3": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 3.1334703781976834
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 31.334703781976835
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 4.700205567296524
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356201_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "유리 미닫이",
+    "ElementType": "테라스 미닫이 8200x2900"
+  },
+  "356245_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356238_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 23.766682416895012
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 142.60009450137008
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 23.766682416895012
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356252_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.813147289024236
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 34.87888373414542
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.813147289024236
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356254_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.548997594823707
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 57.29398556894224
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.548997594823707
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356252_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.911675209177189
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 35.47005125506313
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.911675209177189
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356259_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.289657517525884
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 67.7379451051553
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.289657517525884
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356262_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356259_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.399727916144371
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 62.39836749686623
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.399727916144371
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356269_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.012195598647534
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 72.0731735918852
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.012195598647534
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356259_3": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.498255836297325
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 62.98953501778395
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 10.498255836297325
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356262_2": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356274_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.447360579323082
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 74.68416347593849
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 12.447360579323082
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356276_1": {
+    "Layer": [],
+    "ElementCategory": "Doors",
+    "ElementFamily": "외여닫이문",
+    "ElementType": "실내문 800x2100"
+  },
+  "356274_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.55743097794157
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 69.34458586764941
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 11.55743097794157
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356281_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.648934088769315
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 33.89360453261589
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.648934088769315
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356284_1": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 7.3567513714205015
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 44.14050822852301
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 7.3567513714205015
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356281_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.747462008922268
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 34.484772053533604
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 5.747462008922268
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356252_3": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 7.061167610961641
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 42.367005665769845
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 7.061167610961641
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356254_2": {
+    "Layer": [
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.548997594823707
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 57.29398556894224
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 9.548997594823707
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "내벽 120"
+  },
+  "356291_1": {
+    "Layer": {
+      "Stair Length": 22.471575272751448,
+      "Stair Run Length": 17.060367454068242,
+      "Stair Landing Length": 5.411207818683207,
+      "Stair Run Width": 3.1167979002624673,
+      "Stair Landing Thckness": 0.49212598425196846
+    },
+    "ElementCategory": "Stairs",
+    "ElementFamily": "조립 계단",
+    "ElementType": "콘크리트 U계단"
+  },
+  "356296_1": {
+    "Layer": [
+      {
+        "Material Name": "시멘트 몰탈",
+        "Function": "Finish1",
+        "Material Volume": 6.642989194093148
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 53.14391355274518
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "경사로 180"
+  },
+  "356300_1": {
+    "Layer": [
+      {
+        "Material Name": "타일 백색",
+        "Function": "Finish1",
+        "Material Volume": 3.1677256049175235
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 28.509530444257713
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "슬래브 300"
+  },
+  "356304_1": {
+    "Layer": [
+      {
+        "Material Name": "시멘트 몰탈",
+        "Function": "Finish1",
+        "Material Volume": 6.642989194093151
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 53.14391355274521
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "경사로 180"
+  },
+  "356309_1": {
+    "Layer": {
+      "Railing Length": 26.246719160104988
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356313_1": {
+    "Layer": {
+      "Railing Length": 26.246719160104988
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356319_1": {
+    "Layer": [
+      {
+        "Material Name": "타일 백색",
+        "Function": "Finish1",
+        "Material Volume": 269.63807481858174
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 2426.7426733672355
+      }
+    ],
+    "ElementCategory": "Floors",
+    "ElementFamily": "바닥",
+    "ElementType": "슬래브 300"
+  },
+  "356324_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 16.92270351752178
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 135.38162814017423
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 16.92270351752178
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356327_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 7.204050752516784
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 57.63240602013427
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 7.204050752516784
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356330_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 14.182228896682924
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 113.45783117346339
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 14.182228896682924
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356335_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 14.999669026894304
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 119.99735221515444
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 14.999669026894304
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356339_1": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 8.906358947159418
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 71.25087157727535
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 8.906358947159418
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356342_1": {
+    "Layer": {
+      "Railing Length": 62.33595800524934
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356348_1": {
+    "Layer": {
+      "Railing Length": 49.04855643044618
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356353_1": {
+    "Layer": {
+      "Railing Length": 49.86876640419946
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356355_1": {
+    "Layer": {
+      "Railing Length": 27.23097112860892
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356362_1": {
+    "Layer": {
+      "Railing Length": 8.530183727034121
+    },
+    "ElementCategory": "Railings",
+    "ElementFamily": "난간",
+    "ElementType": "철제 난간 1000"
+  },
+  "356324_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 18.46113111002376
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 147.6890488801901
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 18.46113111002376
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356174_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠 개구부(유리 없음)",
+    "ElementType": "개구부 띠 14700x1200"
+  },
+  "356186_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠 개구부(유리 없음)",
+    "ElementType": "개구부 띠 7800x1200"
+  },
+  "356327_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 7.319615827661787
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 58.556926621294295
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 7.319615827661787
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356330_2": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 14.287993195180599
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 114.30394556144479
+      },
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish2",
+        "Material Volume": 14.287993195180599
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "난간벽 백색 200"
+  },
+  "356146_5": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 48.68126807557203
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 486.8126807557203
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 73.02190211335802
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356152_5": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 42.87200539988715
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 428.7200539988715
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 64.30800809983072
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356158_5": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 48.34577874171788
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 483.4577874171788
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 72.5186681125768
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356161_3": {
+    "Layer": [
+      {
+        "Material Name": "백색 스터코",
+        "Function": "Finish1",
+        "Material Volume": 41.688964064717275
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 416.88964064717277
+      },
+      {
+        "Material Name": "회반죽",
+        "Function": "Finish2",
+        "Material Volume": 62.5334460970759
+      }
+    ],
+    "ElementCategory": "Walls",
+    "ElementFamily": "기본 벽",
+    "ElementType": "외벽 백색 250"
+  },
+  "356190_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 20500x1200"
+  },
+  "356181_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 9700x1200"
+  },
+  "356186_3": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠 개구부(유리 없음)",
+    "ElementType": "개구부 띠 7800x1200"
+  },
+  "356170_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 5300x1200"
+  },
+  "356174_3": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠 개구부(유리 없음)",
+    "ElementType": "개구부 띠 14700x1200"
+  },
+  "356163_2": {
+    "Layer": [],
+    "ElementCategory": "Windows",
+    "ElementFamily": "띠창(fenêtre en longueur)",
+    "ElementType": "띠창 18000x1200"
+  },
+  "356367_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 72.96151403326427
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 243.20504677754755
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  },
+  "356371_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 29.36767684558991
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 97.89225615196636
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  },
+  "356375_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 21.3583104331563
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 71.19436811052101
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  },
+  "356379_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 22.2482400345378
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 74.160800115126
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  },
+  "356383_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 11.420763217729412
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 38.069210725764705
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  },
+  "356388_1": {
+    "Layer": [
+      {
+        "Material Name": "석고보드",
+        "Function": "Finish2",
+        "Material Volume": 10.933420816972877
+      },
+      {
+        "Material Name": "철근콘크리트",
+        "Function": "Structure",
+        "Material Volume": 36.444736056576254
+      }
+    ],
+    "ElementCategory": "Ceilings",
+    "ElementFamily": "복합 천장",
+    "ElementType": "석고보드 천장"
+  }
+}
