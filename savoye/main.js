@@ -13,6 +13,9 @@ import { initCommitView } from "./src/commitView.js";
 import { initAiSummary } from "./src/aiSummary.js";
 import { initBriefing } from "./src/briefing.js";
 import { initDetailsMotion } from "./src/motion.js";
+import { initWalk } from "./src/walk.js";
+
+let walk = null;   // 걷기 모드 — 창마다 하나(다시 불러와도 재사용)
 
 export function main(
     shapeLog,
@@ -28,6 +31,7 @@ export function main(
     windowQ,
     doorQ) {
     const container = document.getElementById("render-target");
+    if (walk?.isOn()) walk.setOn(false);   // 다시 불러올 때 이전 뷰어의 걷기 모드를 끈다
     if (typeof window.__fvCleanup === "function") { try { window.__fvCleanup(); } catch (e) {} } // clean previous load (avoid double render)
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#edf0f4");
@@ -151,6 +155,7 @@ export function main(
     initAiSummary();
     initBriefing();
     initDetailsMotion(document);
+    walk = walk || initWalk();
     sliderControls("fully-slider", timeKeys, timeLog, allGroup, meshDict, charts);
     clickEvent(renderer, camera, allGroup, { chip: document.getElementById("pick-main"), panel: true });
     emit("data");
@@ -225,7 +230,7 @@ export function main(
     animate();
 
     function animate() {
-        controls.update();
+        if (walk?.isOn()) walk.update(); else controls.update();
         __raf = requestAnimationFrame(animate);
         renderer.render(scene, camera);
     }

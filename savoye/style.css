@@ -118,8 +118,25 @@ html, body {
 .glass-btn:hover { background: var(--accent); color: var(--on-tone); border-color: var(--accent); }
 .glass-btn:active { transform: scale(.96); }
 .glass-btn--icon { width: 30px; padding: 0; justify-content: center; }
-.split-toggle { margin-left: auto; }
+.glass-btn.is-on { background: var(--accent); color: var(--on-tone); border-color: var(--accent); }
+.walk-toggle { margin-left: auto; }
 #root.is-split .split-toggle { display: none; }
+
+/* 걷기 모드 — 캔버스 커서와 조작법 안내 칩(켤 때 잠깐) */
+.viewer-host.is-walking canvas { cursor: move; }
+.walk-hint {
+    position: absolute;
+    left: 0; right: 0; bottom: calc(var(--h-sm) + var(--sp-8));   /* 패널 손잡이 위 */
+    width: fit-content; margin: 0 auto;
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    height: var(--h-sm); padding: 0 var(--sp-6);
+    border-radius: var(--r-pill);
+    font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-2);
+    white-space: nowrap;
+    z-index: 6;
+    animation: rise var(--dur) var(--ease);
+}
+.walk-hint kbd + kbd { margin-left: calc(-1 * var(--sp-1)); }
 
 .pick-chip {
     position: absolute;
@@ -1092,6 +1109,16 @@ html, body {
 .aisec__title { min-width: 0; font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--text-2); }
 .aisec .aisec__body strong { display: inline; margin: 0; }
 .aisec__lead { margin-bottom: var(--sp-2); }
+/* 본문은 문단 · 글머리로 규격화(aiSummary.js blockify) — 간격은 여기서만 정한다 */
+.aisec__body p, .aisec__lead p { margin: 0; }
+.aisec__body p + p, .aisec__lead p + p, .aisec__body p + .aisec__list, .aisec__body .aisec__list + p { margin-top: var(--sp-3); }
+.aisec__list { margin: 0; padding-left: var(--sp-7); list-style: none; }
+.aisec__list li { position: relative; }
+.aisec__list li + li { margin-top: var(--sp-2); }
+.aisec__list li::before {
+    content: ""; position: absolute; left: calc(-1 * var(--sp-6)); top: .7em;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--tone, var(--text-3));
+}
 .aisec--inf { background: var(--tone-soft); }
 
 /* ── 카테고리 물량: 층 / 전체 전환 ─────────────────────────────────────────── */

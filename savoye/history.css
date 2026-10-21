@@ -105,11 +105,19 @@
 .hacts { display: flex; gap: 2px; flex-wrap: wrap; margin: 9px -6px -4px; }
 .hacts__ai { color: var(--accent); }   /* 동작 줄은 tone-pin, AI 버튼만 tone-accent */
 
-/* ── 카드별 AI 요약 ───────────────────────────────────────────────────── */
-.hai {
-    margin-top: 10px;
-    padding-top: 9px;
+/* ── 카드별 AI 해석 (관찰 · 영향 · 추론 + 검산 + 근거) ─────────────────── */
+.hai-sec {
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-4);
     border-top: 1px dashed var(--border);
+}
+.hai-sec__head { display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-xs); color: var(--pin-ink); }
+.hai-sec__head b { font-weight: var(--fw-bold); }
+.hai-sec__range { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-3); }
+.hai-sec__head .btn { margin-left: auto; flex: none; }
+.hai-n { margin-left: 4px; font: var(--fw-semibold) var(--fs-2xs) var(--mono); color: var(--text-3); font-style: normal; }
+.hai {
+    margin-top: var(--sp-3);
     font-size: var(--fs-sm);
     line-height: 1.7;
     animation: fade .2s ease;

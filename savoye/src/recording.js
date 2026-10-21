@@ -14,7 +14,7 @@
 // 녹음 구간은 하단 타임라인 아래에도 표시되고, 그 구간을 눌러도 재생된다.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { store, emit, escapeHtml, fetchJsonRetry, onProjectReset } from "./store.js";
+import { store, emit, escapeHtml, fetchJsonRetry, onProjectReset, LAB } from "./store.js";
 import { icon } from "./icons.js";
 import {
     summarizeRecording, getTranscript, hasKey, saveKey,
@@ -374,10 +374,10 @@ function renderList() {
                     ${rec.kind ? `<span class="rec-kind tag tag--line">${escapeHtml(rec.kind)}</span>` : ""}
                     <span>${icon("clock", 12)}${fmtShort(rec.startMs)}${isFinite(rec.endMs) ? ` – ${fmtShort(rec.endMs).slice(6)}` : ""}</span>
                     ${pauseCount ? `<span>일시정지 ${pauseCount}회</span>` : ""}
-                    ${getTranscript(rec) ? `<span>${icon("edit", 12)}전사됨</span>` : ""}
+                    ${LAB && getTranscript(rec) ? `<span>${icon("edit", 12)}전사됨</span>` : ""}
                 </div>
             </div>
-            <button class="rec-ai-btn btn btn--xs btn--soft" type="button" title="이 녹음을 전사해서, 말한 내용과 실제 변경을 대조해요">${icon("sparkle", 13)}AI</button>
+            ${LAB ? `<button class="rec-ai-btn btn btn--xs btn--soft" type="button" title="이 녹음을 전사해서, 말한 내용과 실제 변경을 대조해요">${icon("sparkle", 13)}AI</button>` : ""}
             <span class="rec-dur tag tag--md tag--num">${dur}</span>
             <div class="rec-ai" hidden></div>`;
 
@@ -386,7 +386,7 @@ function renderList() {
         title.textContent = getName(rec);
 
         playBtn.addEventListener("click", (e) => { e.stopPropagation(); playToggle(rec); });
-        row.querySelector(".rec-ai-btn").addEventListener("click", (e) => { e.stopPropagation(); runRecAi(row, rec); });
+        row.querySelector(".rec-ai-btn")?.addEventListener("click", (e) => { e.stopPropagation(); runRecAi(row, rec); });
         row.addEventListener("click", (e) => {
             if (e.target.closest(".rec-title") || e.target.closest(".rec-ai")) return;
             playToggle(rec);
@@ -471,7 +471,7 @@ function recAiResult(rec, { html, transcript, check }) {
     return `
         <div class="rec-ai__body">${sectionize(check ? check.html : html)}</div>
         ${check ? checkBarHtml(check.stats) : ""}
-        <div class="rate"></div>
+        ${LAB ? `<div class="rate"></div>` : ""}
         <details class="rec-ai__script disc"><summary>${icon("chevronRight", 12)}전사 원문</summary><p>${escapeHtml(transcript)}</p></details>
         <div class="rec-ai__foot">
             <span class="rec-ai__model">${escapeHtml(getTranscribeModel())} · ${escapeHtml(getModel())}</span>
@@ -584,6 +584,7 @@ export function initRecordingTab() {
     // 전사 모델 선택 (목록에 없으면 직접 입력)
     const stt = el("ai-stt-model");
     const sttList = el("ai-stt-list");
+    if (stt && !LAB) stt.hidden = true;   // 전사 · 요약은 실험 기능(?lab=1)
     if (stt && sttList) {
         const current = getTranscribeModel();
         const items = TRANSCRIBE_PRESETS.some((m) => m.id === current)

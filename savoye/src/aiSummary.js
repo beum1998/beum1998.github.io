@@ -23,7 +23,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Color } from "three";
-import { store, on, catInfo, levelOf, formatKey, escapeHtml, baseId } from "./store.js";
+import { store, on, catInfo, levelOf, formatKey, escapeHtml, baseId, LAB } from "./store.js";
 import { icon } from "./icons.js";
 import { pinAtIndex } from "./pins.js";
 import { diffElementVersionsFromLists } from "./script/diffView.js";
@@ -359,7 +359,7 @@ function decisionFormat({ relation, observed, spatial, inferred, length = "" }) 
     const [obs, spa, inf] = DECISION_SECTIONS.map((s) => s.title);
     return [
         `분석은 이 순서로 하세요: ① 로그 · 수치 · 이미지에서 직접 확인되는 변경 사실을 찾고 → ② 변경들이 어떤 순서와 관계로 일어났는지 ${relation}로 묶고 → ③ 변경 전후를 비교해 주변 공간과 공간 구성에 준 영향을 파악한 뒤 → ④ 그 흐름이 어떤 설계 의사결정일 수 있는지 해석하세요.`,
-        `한국어로, 아래 세 항목만 제목을 그대로 써서 작성하세요. 강조는 **굵게**만 사용하세요.${length ? ` ${length}` : ""}`,
+        `한국어로, 아래 세 항목만 제목을 그대로 써서 작성하세요. 강조는 **굵게**만 사용하세요. 각 항목은 한두 문장의 도입 뒤에 '- '로 시작하는 글머리로 나눠 쓰고, 글머리 사이에 빈 줄을 넣지 마세요. 글머리 하나는 한 줄로 끝내세요.${length ? ` ${length}` : ""}`,
         "",
         `**${obs}** — 직접 확인되는 사실만 쓰고 해석이나 의도는 섞지 마세요. 개별 변경을 나열하지 말고 관련된 변경끼리 묶어서 쓰세요. ${observed}`,
         `**${spa}** — 변경 때문에 생긴 공간적 · 정량적 영향. ${spatial}`,
@@ -386,11 +386,34 @@ export function sectionize(html) {
     if (hits.length < 2) return html;
     const trim = (t) => t.replace(/^(?:\s|<br>)*(?:[—–:-]\s*)?(?:<br>)*/, "").replace(/(?:\s|<br>)+$/, "");
     const lead = trim(html.slice(0, hits[0].start));
-    return (lead ? `<div class="aisec__lead">${lead}</div>` : "") + hits.map((h, i) => `
+    return (lead ? `<div class="aisec__lead">${blockify(lead)}</div>` : "") + hits.map((h, i) => `
         <section class="aisec aisec--${h.sec.key} ${h.sec.tone}">
             <div class="aisec__head"><span class="aisec__tag tag">${h.sec.title}</span></div>
-            <div class="aisec__body">${trim(html.slice(h.end, hits[i + 1]?.start ?? html.length))}</div>
+            <div class="aisec__body">${blockify(trim(html.slice(h.end, hits[i + 1]?.start ?? html.length)))}</div>
         </section>`).join("");
+}
+
+/**
+ * 항목 본문의 줄(<br>)을 문단과 글머리로 다시 묶는다. 모델이 글머리 사이에 빈 줄을 넣거나
+ * 안 넣거나, '-' · '•' · '–' 중 무엇을 쓰든 화면에서는 같은 간격 · 같은 점으로 보이게 한다.
+ * 글머리 뒤에 이어지는 들여쓴 줄은 그 글머리의 계속으로 본다. 글자는 바꾸지 않고 포장만 한다.
+ */
+export function blockify(html) {
+    const lines = String(html || "").split(/\s*<br>\s*/);
+    const BULLET = /^(?:[-•–·*]|\d+[.)])\s+/;
+    const out = [];
+    let list = null, para = [];
+    const flushPara = () => { if (para.length) { out.push(`<p>${para.join(" ")}</p>`); para = []; } };
+    const flushList = () => { if (list) { out.push(`<ul class="aisec__list">${list.map((li) => `<li>${li}</li>`).join("")}</ul>`); list = null; } };
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) { flushPara(); continue; }           // 빈 줄은 문단 경계일 뿐, 목록은 끊지 않는다
+        if (BULLET.test(line)) { flushPara(); (list ||= []).push(line.replace(BULLET, "")); continue; }
+        if (list && /^\s/.test(raw)) { list[list.length - 1] += " " + line; continue; }   // 들여쓴 계속 줄
+        flushList(); para.push(line);
+    }
+    flushPara(); flushList();
+    return out.join("");
 }
 
 function pinSummary(pin) {
@@ -829,6 +852,9 @@ function keyMs(key) {
 // 좁은 목록(핀 탭)에서 "전체 보기"로 펼친 핀 — 목록을 다시 그려도 펼친 상태를 유지한다
 const expandedSummaries = new Set();
 
+/** 사람 평가(정확 · 부분 · 오류) 자리 — 연구용 실험 기능이라 ?lab=1 에서만 붙인다 */
+const rateSlot = () => (LAB ? `<div class="rate"></div>` : "");
+
 export function mountPinSummary(container, pin, { autoRun = false, onChange, compact = false } = {}) {
     if (!container) return;
     container.dataset.pin = pin.id;
@@ -848,7 +874,7 @@ export function mountPinSummary(container, pin, { autoRun = false, onChange, com
                     ${icon("sparkle", 12)}<b>AI 요약</b>
                     ${stale ? `<span class="aiblk__tag aiblk__tag--warn tag tone-mod" title="그 사이에 핀이 바뀌었어요">구간 바뀜</span>` : ""}
                     ${checkTagHtml(check.stats)}
-                    ${verdict ? `<span class="aiblk__tag aiblk__tag--${verdict.id} tag ${VERDICT_TONE[verdict.id] || ""}">평가 · ${verdict.label}</span>` : ""}
+                    ${verdict && LAB ? `<span class="aiblk__tag aiblk__tag--${verdict.id} tag ${VERDICT_TONE[verdict.id] || ""}">평가 · ${verdict.label}</span>` : ""}
                 </div>
                     <span class="aiblk__chev">${icon("chevronDown", 12)}</span>
                 </div>
@@ -871,12 +897,12 @@ export function mountPinSummary(container, pin, { autoRun = false, onChange, com
             <div class="aiblk__body">${sectionize(check.html)}</div>
             ${checkBarHtml(check.stats)}${legacyCheckNote(saved)}
             ${evidenceHtml(saved.evidence)}
-            <div class="rate"></div>
+            ${rateSlot()}
             <div class="aiblk__foot">
                 <span class="aiblk__model">${escapeHtml(saved.model || "")} · ${fmtWhen(saved.at)}</span>
                 <button class="btn btn--ghost btn--xs" type="button" data-ai-act="again">${icon("refresh", 12)}다시 요약</button>
             </div>`);
-        mountRating(container.querySelector(".rate"), {
+        if (LAB) mountRating(container.querySelector(".rate"), {
             kind: "pin",
             id: pin.id,
             meta: {
@@ -1058,12 +1084,12 @@ export function mountBriefingSummary(container, from, to, { autoRun = false } = 
             <div class="aiblk__body">${sectionize(check.html)}</div>
             ${checkBarHtml(check.stats)}
             ${evidenceHtml(saved.evidence)}
-            <div class="rate"></div>
+            ${rateSlot()}
             <div class="aiblk__foot">
                 <span class="aiblk__model">${escapeHtml(saved.model || "")} · ${fmtWhen(saved.at)}</span>
                 <button class="btn btn--ghost btn--xs" type="button" data-brai="again">${icon("refresh", 12)}다시 만들기</button>
             </div>`);
-        mountRating(container.querySelector(".rate"), {
+        if (LAB) mountRating(container.querySelector(".rate"), {
             kind: "briefing",
             id: `${saved.fromKey}→${saved.toKey}`,
             meta: {
@@ -1232,13 +1258,13 @@ export function mountProjectSummary(container, { autoRun = false, onChange } = {
             ${stale ? `<div class="aiblk__stale notice tone-mod">${icon("alert", 12)}그 뒤로 핀이 바뀌었어요. 다시 쓰면 지금 이력으로 정리해요.</div>` : ""}
             <div class="aiblk__body">${sectionize(check.html)}</div>
             ${checkBarHtml(check.stats)}
-            <div class="rate"></div>
+            ${rateSlot()}
             <div class="aiblk__foot">
                 <span class="aiblk__model">${escapeHtml(saved.model || "")} · 핀 ${saved.pinCount}개 기준 · ${fmtWhen(saved.at)}</span>
                 <button class="btn btn--ghost btn--xs" type="button" data-proj-act="again">${icon("refresh", 12)}다시 쓰기</button>
                 <button class="btn btn--ghost btn--xs" type="button" data-proj-act="close">${icon("x", 12)}닫기</button>
             </div>`);
-        mountRating(container.querySelector(".rate"), {
+        if (LAB) mountRating(container.querySelector(".rate"), {
             kind: "project",
             id: "project",
             meta: {
@@ -1302,6 +1328,8 @@ export function initAiSummary() {
 
     const section = document.getElementById("ai-summary");
     if (!section) return;
+    // 비교 탭의 AI 요약은 핀 · Commit 해석과 겹치는 실험 기능 — 평소에는 숨기고 ?lab=1 에서만 연다
+    section.hidden = !LAB;
     const runBtn = document.getElementById("ai-run");
     const output = document.getElementById("ai-output");
     const loading = document.getElementById("ai-loading");

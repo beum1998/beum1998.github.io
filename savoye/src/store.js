@@ -16,6 +16,15 @@
 //   recordings   녹음 목록 로드 → recordings[]
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ?lab=1 — 연구 · 개발용 실험 기능을 함께 연다(요약 평가 하네스, 프로젝트 진행 서술, 보고서 · 백업,
+// 녹음 전사 · 요약, 비교 탭 AI 요약). 평소 화면에서는 숨긴다. 자체 점검(?selftest=ai)은 늘 켠다.
+export const LAB = (() => {
+    try {
+        const p = new URLSearchParams(location.search);
+        return p.get("lab") === "1" || p.get("selftest") === "ai";
+    } catch { return false; }
+})();
+
 export const store = {
     shapeLog: null,
     timeLog: null,

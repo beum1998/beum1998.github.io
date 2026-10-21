@@ -12,7 +12,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Color } from "three";
-import { store, on, emit, catInfo, levelOf, formatKey, escapeHtml, onProjectReset } from "./store.js";
+import { store, on, emit, catInfo, levelOf, formatKey, escapeHtml, onProjectReset, LAB } from "./store.js";
 import { icon } from "./icons.js";
 import { diffElementVersionsFromLists } from "./script/diffView.js";
 import { captureViews, DEFAULT_DIR } from "./shoot.js";
@@ -40,6 +40,7 @@ export function initHistory() {
     let order = "desc";               // 최신순
     let view = "rail";                // rail(이력) | analysis(재작업 분석)
     let highlightAdded = true;
+    let showAi = true;                // 카드마다 AI 해석(관찰 · 영향 · 추론)을 펼쳐 둘지
     let dir = DEFAULT_DIR;            // 모든 썸네일이 공유하는 카메라 방향
 
     store.openHistory = () => {
@@ -75,6 +76,7 @@ export function initHistory() {
         if (act === "order") { order = order === "desc" ? "asc" : "desc"; render(); return; }
         if (act === "reshoot") { reshootFromCurrentView(); return; }
         if (act === "highlight") { highlightAdded = !highlightAdded; shots.clear(); render(); return; }
+        if (act === "ai-all") { showAi = !showAi; render(); return; }
         if (act === "menu") { toggleMenu(); return; }
         if (act === "view") {
             const next = e.target.closest("[data-view]")?.dataset.view;
@@ -199,13 +201,12 @@ export function initHistory() {
                             </div>
                         </details>` : ""}
                         <div class="hacts tone-pin">
-                            ${getPinSummary(pin.id) ? "" : `<button class="btn btn--ghost btn--xs hacts__ai tone-accent" type="button" data-act="ai" title="이전 핀 대비 변화를 AI가 요약해요">${icon("sparkle", 13)}AI 요약</button>`}
                             <button class="btn btn--ghost btn--xs" type="button" data-act="goto">${icon("arrowRight", 13)}이 시점 보기</button>
                             <button class="btn btn--ghost btn--xs" type="button" data-act="compare">${icon("compare", 13)}${s.prev ? "이전 핀과 비교" : "처음과 비교"}</button>
-                            <button class="btn btn--ghost btn--xs" type="button" data-act="view">${icon("doc", 13)}해석 보기</button>
+                            <button class="btn btn--ghost btn--xs" type="button" data-act="view">${icon("doc", 13)}입력 · 해석 한 화면</button>
                             ${s.recs[0] ? `<button class="btn btn--ghost btn--xs" type="button" data-act="play">${icon("mic", 13)}녹음 ${s.recs.length}개</button>` : ""}
                         </div>
-                        <div class="hai aiblk"${getPinSummary(pin.id) ? "" : " hidden"}></div>
+                        ${aiSectionHtml(pin, s)}
                     </div>
                 </article>`;
             return order === "desc" ? card + gap : gap + card;
@@ -219,7 +220,26 @@ export function initHistory() {
         stagger(root.querySelectorAll(".hseg"), { step: 22 });
     }
 
+    /**
+     * 카드의 AI 해석 칸. 요약이 있으면 관찰 · 영향 · 추론 세 항목과 검산을 펼쳐 두고(aiSummary.mountPinSummary 가 채운다),
+     * 없으면 "AI 해석" 버튼 하나. 머리의 [AI 해석] 토글로 모든 카드를 한 번에 접고 편다.
+     */
+    function aiSectionHtml(pin, s) {
+        const saved = getPinSummary(pin.id);
+        if (!showAi) return "";
+        return `
+            <section class="hai-sec" aria-label="AI 해석">
+                <div class="hai-sec__head">
+                    ${icon("sparkle", 13)}<b>AI 해석</b>
+                    <span class="hai-sec__range">${s.prev ? `${escapeHtml(s.prev.title)} → 이 핀` : "처음 → 이 핀"}</span>
+                    ${saved ? "" : `<button class="btn btn--soft btn--xs tone-accent" type="button" data-act="ai" title="${s.prev ? "이전 핀과 이 핀 사이의 변화를 AI가 해석해요" : "처음부터 이 핀까지의 변화를 AI가 해석해요"}">${icon("sparkle", 12)}해석 만들기</button>`}
+                </div>
+                <div class="hai aiblk"${saved ? "" : " hidden"}></div>
+            </section>`;
+    }
+
     function header(count) {
+        const withAi = store.pins.filter((p) => getPinSummary(p.id)).length;
         return `
             <div class="hhead">
                 <div class="hhead__title">${icon("pinSolid", 16)}<b>작업 이력</b><span>${count}개 핀</span></div>
@@ -229,26 +249,28 @@ export function initHistory() {
                 </div>
                 <div class="hhead__actions">
                     ${view === "rail" ? `
+                    <button class="btn btn--ghost btn--xs${showAi ? " is-on" : ""}" type="button" data-act="ai-all" aria-pressed="${showAi}" title="카드마다 AI 해석(관찰 · 영향 · 추론)을 펼쳐 두거나 접어요">${icon("sparkle", 13)}AI 해석${count ? `<em class="hai-n">${withAi}/${count}</em>` : ""}</button>
                     <button class="btn btn--ghost btn--xs" type="button" data-act="order">${icon("layers", 13)}${order === "desc" ? "최신순" : "오래된순"}</button>
                     <button class="btn btn--ghost btn--xs${highlightAdded ? " is-on" : ""}" type="button" data-act="highlight">${icon("focus", 13)}추가 요소 강조</button>
                     <button class="btn btn--ghost btn--xs" type="button" data-act="reshoot">${icon("refresh", 13)}현재 각도로 다시 찍기</button>` : ""}
-                    <button class="btn btn--primary btn--xs" type="button" data-act="project">${icon("sparkle", 13)}프로젝트 진행 서술</button>
+                    ${LAB ? `<button class="btn btn--primary btn--xs" type="button" data-act="project">${icon("sparkle", 13)}프로젝트 진행 서술</button>` : ""}
                     <div class="hmenu">
-                        <button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="menu" title="내보내기 · 백업" aria-label="내보내기 · 백업">${icon("more", 15)}</button>
+                        <button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="menu" title="${LAB ? "브리핑 · 내보내기 · 백업" : "브리핑"}" aria-label="${LAB ? "브리핑 · 내보내기 · 백업" : "브리핑"}">${icon("more", 15)}</button>
                         <div class="hmenu__pop menu" hidden>
                             <button class="menu__item" type="button" data-act="briefing">${icon("clock", 14)}<span>지난번 이후 브리핑</span><em>기준 시점부터 지금까지</em></button>
+                            ${LAB ? `
                             <hr class="menu__sep">
                             <button class="menu__item" type="button" data-act="report">${icon("doc", 14)}<span>이력 보고서 (HTML)</span><em>인쇄하면 PDF</em></button>
                             <button class="menu__item" type="button" data-act="ratings">${icon("download", 14)}<span>요약 평가 내보내기 (CSV)</span><em>${escapeHtml(ratingLine())}</em></button>
                             <hr class="menu__sep">
                             <button class="menu__item" type="button" data-act="backup">${icon("download", 14)}<span>백업 (JSON)</span><em>회고 핀 · 요약 · 평가 · 전사</em></button>
-                            <button class="menu__item" type="button" data-act="restore">${icon("upload", 14)}<span>백업 복원</span><em>지금 것과 합쳐요</em></button>
+                            <button class="menu__item" type="button" data-act="restore">${icon("upload", 14)}<span>백업 복원</span><em>지금 것과 합쳐요</em></button>` : ""}
                         </div>
                     </div>
                     <button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="close" title="닫기" aria-label="닫기">${icon("x", 15)}</button>
                 </div>
             </div>
-            <div class="hproj aiblk"${getProjectSummary() ? "" : " hidden"}></div>`;
+            ${LAB ? `<div class="hproj aiblk"${getProjectSummary() ? "" : " hidden"}></div>` : ""}`;
     }
 
     function gapRow(s, maxEvents, i, n) {
@@ -335,6 +357,7 @@ export function initHistory() {
     function openAi(card, pin) {
         const box = card.querySelector(".hai");
         if (!box) return;
+        card.querySelector('.hai-sec__head [data-act="ai"]')?.remove();   // 만드는 동안 버튼은 치운다
         box.hidden = false;
         mountPinSummary(box, pin, { onChange: onSummaryChange });
     }
