@@ -83,12 +83,23 @@
                 </div>
                 <div class="viewer-host viewer-surface" id="render-target">
                     <div class="pick-chip glass" id="pick-main" hidden></div>
+                    <div class="hide-pop glass" id="hide-pop" hidden role="dialog" aria-label="숨긴 요소">
+                        <div class="hide-pop__head"><b>숨긴 요소</b>
+                            <button class="btn btn--ghost btn--sm" type="button" data-show-all>모두 보이기</button>
+                            <button class="btn btn--ghost btn--icon btn--sm" type="button" data-close aria-label="닫기"><svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+                        </div>
+                        <ul class="hide-pop__list" data-hide-list></ul>
+                    </div>
                     <div class="walk-hint glass" id="walk-hint" hidden><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 · <kbd>Q</kbd><kbd>E</kbd> 위아래 · 드래그 시선 · <kbd>Esc</kbd> 끄기</div>
                 </div>
                 <header class="pane-head">
                     <span class="pane-tag pane-tag--main glass" id="main-tag">현재 시점</span>
                     <span class="pane-time glass" id="main-time">—</span>
                     <span class="pane-pin glass" id="main-pin" hidden></span>
+                    <button class="glass-btn glass hide-toggle" id="hide-toggle" type="button" hidden aria-expanded="false" title="숨긴 요소 보기 · 다시 켜기">
+                        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.6A10 10 0 0 1 12 5.5c6.4 0 10 6.5 10 6.5a17 17 0 0 1-3.2 3.9M6.6 6.7A17 17 0 0 0 2 12s3.6 6.5 10 6.5c1.4 0 2.6-.3 3.7-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                        <span>숨김 <b data-hide-count>0</b></span>
+                    </button>
                     <button class="glass-btn glass walk-toggle" id="walk-toggle" type="button" title="1인칭으로 걷기 (W A S D 이동 · Q E 위아래 · 드래그 시선 · Esc 끄기)" aria-pressed="false">
                         <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="1.6"/><path d="M12.5 7.5 9 11l2 3-2.5 6M9 11l-3 1.5M11 14l3 1.5 2.5 4.5M12.5 7.5l3 2 2.5 1"/></svg>
                         <span>걷기</span>

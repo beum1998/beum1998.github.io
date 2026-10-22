@@ -4,7 +4,7 @@
 //   · 캔버스를 "클릭"했을 때만 선택(드래그로 회전한 경우는 무시)
 //   · 선택 요소는 은은하게 발광 + 뷰어 좌하단 칩(카테고리 · 타입 · 층)
 //   · 메인 뷰어는 우측 [요소] 탭에 상세 정보(검색 가능한 파라미터 포함)
-//   · Ctrl+Alt+클릭: 요소 숨기기(시간 이동해도 유지)
+//   · 요소 숨기기: 칩의 [숨기기] · H 키 · Ctrl+Alt+클릭 (hideElements.js, 시간을 옮겨도 유지, 머리줄 [숨김 n] 에서 다시 켠다)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import * as THREE from "three";
@@ -12,6 +12,7 @@ import { store, on, catInfo, levelOf, formatKey, escapeHtml, baseId, onProjectRe
 import { direction } from "./changeDiff.js";
 import { renderElementHistory } from "./elementHistory.js";
 import { icon } from "./icons.js";
+import { hideElement } from "./hideElements.js";
 
 const SELECT_EMISSIVE = 0x24406e;
 const openSections = new Set(["Geometry", "Property", "Layers"]);
@@ -64,9 +65,9 @@ export function clickEvent(renderer, camera, allGroup, opts = {}) {
         const g = pick(e);
         if (d.hide) {
             if (g) {
-                g.visible = false;
-                if (g.userData) g.userData.visible = false;
-                if (g === selected) select(null);
+                const base = baseId(g.name);
+                if (base === selectedBase) select(null);
+                hideElement(base);
             }
             return;
         }
@@ -79,9 +80,18 @@ export function clickEvent(renderer, camera, allGroup, opts = {}) {
         const onChipClick = (e) => {
             if (e.target.closest("[data-act=close]")) select(null);
             else if (e.target.closest("[data-act=info]")) store.setTab?.("info");
+            else if (e.target.closest("[data-act=hide]")) hideSelected();
         };
         chip.addEventListener("click", onChipClick);
         chip.__ablOff = () => chip.removeEventListener("click", onChipClick);
+    }
+
+    /** 고른 요소만 숨기고 선택은 푼다(다시 켜기는 머리줄 [숨김 n]) */
+    function hideSelected() {
+        if (selectedBase == null) return;
+        const base = selectedBase;
+        select(null);
+        hideElement(base);
     }
 
     function pick(e) {
@@ -157,10 +167,11 @@ export function clickEvent(renderer, camera, allGroup, opts = {}) {
                 <em>${escapeHtml(lv.name)} · #${escapeHtml(String(c.ElementId || "").split("_")[0])}</em>
             </div>
             ${showInPanel ? `<button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="info" title="요소 정보 보기" aria-label="요소 정보 보기">${icon("info", 15)}</button>` : ""}
+            ${showInPanel ? `<button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="hide" title="이 요소 숨기기 (H)" aria-label="이 요소 숨기기">${icon("eyeOff", 15)}</button>` : ""}
             <button class="btn btn--ghost btn--icon btn--sm" type="button" data-act="close" title="선택 해제" aria-label="선택 해제">${icon("x", 14)}</button>`;
     }
 
-    return { select, get selected() { return selected; } };
+    return { select, get selected() { return selected; }, get selectedBase() { return selectedBase; } };
 }
 
 // ── 요소 탭 ─────────────────────────────────────────────────────────────────
@@ -174,7 +185,7 @@ function renderPanel(info) {
                 <div class="empty__icon">${icon("box", 22)}</div>
                 <div class="empty__title">요소를 선택하세요</div>
                 <p class="empty__text">3D 뷰에서 요소를 클릭하면 카테고리 · 타입 · 층 · 파라미터를 보여줘요.<br>
-                <span class="kbd">Ctrl</span> + <span class="kbd">Alt</span> + 클릭은 요소 숨기기예요.</p>
+                고른 요소는 칩의 눈 버튼이나 <span class="kbd">H</span> 키로 숨길 수 있어요(<span class="kbd">Ctrl</span> + <span class="kbd">Alt</span> + 클릭도 같아요). 다시 켜기는 3D 위의 <b>숨김</b> 버튼에서 해요.</p>
             </div>`;
         return;
     }

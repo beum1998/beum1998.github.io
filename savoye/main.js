@@ -14,6 +14,7 @@ import { initAiSummary } from "./src/aiSummary.js";
 import { initBriefing } from "./src/briefing.js";
 import { initDetailsMotion } from "./src/motion.js";
 import { initWalk } from "./src/walk.js";
+import { initHideElements } from "./src/hideElements.js";
 
 let walk = null;   // 걷기 모드 — 창마다 하나(다시 불러와도 재사용)
 
@@ -157,7 +158,8 @@ export function main(
     initDetailsMotion(document);
     walk = walk || initWalk();
     sliderControls("fully-slider", timeKeys, timeLog, allGroup, meshDict, charts);
-    clickEvent(renderer, camera, allGroup, { chip: document.getElementById("pick-main"), panel: true });
+    const picker = clickEvent(renderer, camera, allGroup, { chip: document.getElementById("pick-main"), panel: true });
+    initHideElements(() => picker.selectedBase);
     emit("data");
     emit("time:main", store.mainIndex);
 
