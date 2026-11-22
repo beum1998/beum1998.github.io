@@ -19,6 +19,7 @@ import { icon } from "./icons.js";
 import {
     summarizeRecording, getTranscript, hasKey, saveKey,
     getTranscribeModel, setTranscribeModel, getModel, TRANSCRIBE_PRESETS, sectionize,
+    getSendTranscripts, setSendTranscripts,
 } from "./aiSummary.js";
 import { expand, morph } from "./motion.js";
 import { mountRating, plainText } from "./rating.js";
@@ -594,6 +595,14 @@ export function initRecordingTab() {
         stt.value = current;
         stt.addEventListener("change", () => setTranscribeModel(stt.value));
         stt.addEventListener("blur", () => { if (!stt.value.trim()) stt.value = getTranscribeModel(); });
+    }
+
+    // 전사를 핀 해석 · 브리핑에 함께 보낼지 — 기본은 보내지 않음, 실험 기능에서만 켠다
+    const send = el("ai-send-transcript");
+    if (send) {
+        send.closest("label").hidden = !LAB;
+        send.checked = getSendTranscripts();
+        send.addEventListener("change", () => setSendTranscripts(send.checked));
     }
 
     renderList();

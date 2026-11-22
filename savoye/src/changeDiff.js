@@ -13,6 +13,10 @@
 // 기록된 값이 하나도 안 바뀐 버전 변경은 "함께 갱신"으로 분류한다 — 데모 데이터에서 수정의 약 4할이
 // 이런 갱신(붙어 있는 벽이 바뀌며 창 · 커튼월이 함께 갱신되는 경우 등)이라, 수정으로 세면 과장된다.
 //
+// 단계(연속한 두 기록 시점 사이의 변경 하나)의 분류와 표시도 여기서 붙인다(stepsAt):
+//   입력 값 변경 · 결과값만 변경 · 부수적 갱신(화면의 "함께 갱신"), 설계자 자신의 단계인지,
+//   호스트 때문에 "전파되었을 수 있음"인지. 구간 단위의 분류와 수치는 segment.js 가 이것으로 만든다.
+//
 // 문장은 모두 코드가 만든다. AI 는 이 문장을 인용만 한다.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -369,6 +373,54 @@ export function diffVersions(prevId, nextId) {
     return res;
 }
 
+// ── 단계의 분류와 표시 ──────────────────────────────────────────────────────
+/**
+ * 두 버전 비교 결과의 분류.
+ *   "input"       입력 값 변경 — 차이 가운데 결과값이 아닌 것이 하나라도 있다
+ *   "derived"     결과값만 변경 — 차이가 있고 모두 결과값(면적 · 체적 · 둘레 · 계산된 고도 · 재료 층 체적 등)이다
+ *   "incidental"  부수적 갱신(화면의 "함께 갱신") — 비교에 차이가 없다
+ */
+export function changeClass(diff) {
+    if (diff?.items?.length) return "input";
+    if (diff?.derived?.length) return "derived";
+    return "incidental";
+}
+
+let stepOwner = null;
+const stepCache = new Map();
+
+/**
+ * 한 기록 시점(트랜잭션)의 단계들에 분류와 표시를 붙인다. 서술 · 숫자 검사 · 화면이 모두 이것을 쓴다.
+ *   cls      수정 단계의 분류(changeClass). 추가 · 삭제는 null
+ *   own      설계자 자신의 단계 — 추가 · 삭제 · 입력 값 변경. 누가 일으켰는지가 아니라 어떤 값이 달라졌는지로 정한다
+ *   flagged  "전파되었을 수 있음" — 자신의 단계인데, 같은 트랜잭션에서 그 요소의 호스트가 입력 값 변경을
+ *            겪었거나 삭제됐다(벽을 옮기면 문도 옮겨지고, 벽을 지우면 문도 지워진다). 벽에 문을 넣을 때는
+ *            벽이 결과값만 바뀌므로 표시하지 않는다. 호스트 관계만 본다(결합 · 그룹 · 타입 편집은 잡지 않는다).
+ *   cause    부수적 갱신일 때 같은 트랜잭션의 사정 — "host"(호스트에 단계가 있음) · "co"(다른 요소에 단계가 있음) · "none"
+ * 호스트는 그 단계의 요소 버전에 기록된 것으로 읽는다(삭제는 지워지기 전 버전).
+ * @returns {{ base: string, kind: "add"|"mod"|"del", id: string|null, prevId: string|null,
+ *             cls: string|null, own: boolean, flagged: boolean, cause?: string }[]}
+ */
+export function stepsAt(index) {
+    const R = analyzeRework();
+    if (stepOwner !== R) { stepCache.clear(); stepOwner = R; }
+    if (stepCache.has(index)) return stepCache.get(index);
+
+    const steps = (R.stepsAt[index] || []).map((s) => {
+        const cls = s.kind === "mod" ? changeClass(diffVersions(s.prevId, s.id)) : null;
+        return { ...s, cls, own: s.kind !== "mod" || cls === "input", flagged: false };
+    });
+    const byBase = new Map(steps.map((s) => [s.base, s]));
+    for (const s of steps) {
+        const host = store.meshDict[s.id ?? s.prevId]?.userData?.Geometry?.HostId;
+        const h = host != null ? byBase.get(String(host)) : null;
+        if (s.own) s.flagged = Boolean(h && (h.kind === "del" || h.cls === "input"));
+        else if (s.cls === "incidental") s.cause = h ? "host" : steps.length > 1 ? "co" : "none";
+    }
+    stepCache.set(index, steps);
+    return steps;
+}
+
 function rank(item) {
     if (item.kind === "type") return 0;
     if (item.kind === "param" && item.delta != null) return 1;
@@ -397,17 +449,11 @@ function versionAt(base, index) {
     return null;
 }
 
-/** 같은 시점에 바뀐 다른 요소가 있는지 (함께 갱신 판단용) */
-function coChangedAt(index, selfBase) {
-    const R = analyzeRework();
-    const total = R.addAt[index] + R.modAt[index] + R.delAt[index];
-    return total > 1 || (total === 1 && !R.lives.get(selfBase)?.changes.includes(index));
-}
-
 /**
  * 요소 기본 ID 의 전체 이력.
  * @returns {{ life, entries: Entry[] }}
- *   Entry = { index, key, ms, kind: "add"|"mod"|"del"|"revive", versionId, diff?, cascade? }
+ *   Entry = { index, key, ms, kind: "add"|"mod"|"del"|"revive", versionId, diff?, cascade?, flagged }
+ *   cascade · flagged 는 stepsAt 이 붙인 것(부수적 갱신의 사정 · 전파되었을 수 있음)
  */
 export function elementHistory(base) {
     const R = analyzeRework();
@@ -416,9 +462,10 @@ export function elementHistory(base) {
 
     const entries = [];
     const spanStarts = new Set(life.spans.map(([s]) => s));
+    const stepOf = (index) => stepsAt(index).find((s) => s.base === life.base);
     for (const index of life.changes) {
         const versionId = versionAt(life.base, index);
-        const entry = { index, key: store.timeKeys[index], ms: store.keyMs[index], versionId };
+        const entry = { index, key: store.timeKeys[index], ms: store.keyMs[index], versionId, flagged: Boolean(stepOf(index)?.flagged) };
         if (spanStarts.has(index)) {
             entry.kind = index === life.firstIdx ? "add" : "revive";
         } else {
@@ -426,24 +473,15 @@ export function elementHistory(base) {
             const prevId = versionAt(life.base, index - 1);
             entry.prevId = prevId;
             entry.diff = diffVersions(prevId, versionId);
-            if (entry.diff.quiet) entry.cascade = cascadeReason(life, index, versionId);
+            if (entry.diff.quiet) entry.cascade = stepOf(index)?.cause || "none";
         }
         entries.push(entry);
     }
     for (const [, end] of life.spans) {
-        if (end < R.n - 1) entries.push({ index: end + 1, key: store.timeKeys[end + 1], ms: store.keyMs[end + 1], kind: "del", versionId: versionAt(life.base, end) });
+        if (end < R.n - 1) entries.push({ index: end + 1, key: store.timeKeys[end + 1], ms: store.keyMs[end + 1], kind: "del", versionId: versionAt(life.base, end), flagged: Boolean(stepOf(end + 1)?.flagged) });
     }
     entries.sort((a, b) => a.index - b.index || (a.kind === "del" ? -1 : 1));
     return { life, entries };
-}
-
-function cascadeReason(life, index, versionId) {
-    const host = store.meshDict[versionId]?.userData?.Geometry?.HostId;
-    if (host != null) {
-        const hostLife = analyzeRework().lives.get(String(host));
-        if (hostLife?.changes.includes(index)) return "host";
-    }
-    return coChangedAt(index, life.base) ? "co" : "none";
 }
 
 export const CASCADE_TEXT = {
@@ -454,9 +492,13 @@ export const CASCADE_TEXT = {
 
 // ── 구간 요약 (핀 · 비교 · 브리핑 공용) ────────────────────────────────────
 /**
- * from → to 사이 수정된 요소들의 변경 내용을 모은다(순변화: from 시점 버전 → to 시점 버전).
+ * from → to 사이 수정된 요소들의 변경 내용을 모은다(순 단계: from 시점 버전 → to 시점 버전).
  * 같은 값 변화(항목 · 이전 → 이후)는 "패턴" 하나로 묶어 요소 수를 센다 — 47개가 똑같이 바뀌면 한 줄.
- * @returns {{ groups: {group, count, patterns}[], changed, quiet, derivedOnly, lines: string[], total }}
+ * diff 는 segment.js 가 분류한 차이다: modified 에는 순 단계가 입력 값 변경인 요소(수정됨)만 있고,
+ * 결과값만 변경 · 바꿨다 되돌림 · 부수적 갱신은 derivedOnly · restored · incidental 에 따로 있다.
+ * (분류하지 않은 차이를 넘기면 여기서 순 단계만으로 나눈다 — 그때는 되돌림과 부수적 갱신을 구분하지 못한다)
+ * @returns {{ groups: {group, count, patterns}[], changed, quiet, derivedOnly, restored, lines: string[], total }}
+ *   changed 수정됨 · derivedOnly 결과값만 변경 · quiet 부수적 갱신 · restored 바꿨다 되돌림 · total 넷의 합
  *   pattern = { item, count, bases: string[], cats: {label,count}[] }
  */
 export function summarizeModifications(diff, { exampleLimit = 12 } = {}) {
@@ -467,8 +509,9 @@ export function summarizeModifications(diff, { exampleLimit = 12 } = {}) {
     for (const afterId of diff.modified.after) {
         const prevId = before.get(baseId(afterId));
         const d = diffVersions(prevId, afterId);
-        if (d.quiet) { quiet++; continue; }
-        if (d.derivedOnly) { derivedOnly++; continue; }
+        const cls = changeClass(d);
+        if (cls === "incidental") { quiet++; continue; }
+        if (cls === "derived") { derivedOnly++; continue; }
         const seen = new Set();
         const cat = catInfo(store.meshDict[afterId]?.userData?.Common?.ElementCategory).label;
         for (const item of d.items) {
@@ -510,13 +553,18 @@ export function summarizeModifications(diff, { exampleLimit = 12 } = {}) {
         if (!added) break;
     }
 
+    const changed = diff.modified.after.length - quiet - derivedOnly;
+    derivedOnly += diff.derivedOnly?.after.length || 0;
+    quiet += diff.incidental?.after.length || 0;
+    const restored = diff.restored?.after.length || 0;
     return {
         groups: list,
-        changed: diff.modified.after.length - quiet - derivedOnly,
+        changed,
         quiet,
         derivedOnly,
+        restored,
         lines,
-        total: diff.modified.after.length,
+        total: changed + derivedOnly + quiet + restored,
     };
 }
 

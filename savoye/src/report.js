@@ -62,7 +62,7 @@ export function buildHistoryReport() {
                 <h2>${escapeHtml(pin.title)}</h2>
                 ${pin.note ? `<p class="note">${escapeHtml(pin.note)}</p>` : ""}
                 <p class="counts">
-                    <b>${prev ? "이전 핀 대비" : "처음부터"}</b>
+                    <b>${prev ? "이전 핀 대비" : "처음(빈 모델)부터"}</b>
                     추가 <b class="add">${diff.addedIds.length}</b> ·
                     삭제 <b class="del">${diff.deletedIds.length}</b> ·
                     수정 <b class="mod">${diff.modified.after.length}</b>
@@ -132,6 +132,7 @@ export function buildHistoryReport() {
   .aisec { margin-top:8px; padding:7px 10px 8px; border-left:3px solid var(--line); border-radius:6px; background:#f8f9fc; }
   .aisec__head { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
   .aisec__tag { padding:0 7px; border-radius:999px; font-size:11px; font-weight:700; }
+  .aisec__check { font-size:11px; color:#6b7280; }
   .aisec__title { font-size:12px; font-weight:700; color:var(--sub); }
   .aisec--obs { border-left-color:#2563eb; } .aisec--obs .aisec__tag { background:#e9f0fe; color:#1d4ed8; }
   .aisec--spa { border-left-color:#0d9488; } .aisec--spa .aisec__tag { background:#e3f5f2; color:#0f766e; }
@@ -175,7 +176,7 @@ function modsBlock(m) {
     const groups = m.groups.slice(0, 8);
     return `
                 <div class="mods">
-                    <div class="mods__head">수정 내용 <span>${m.total}개 중 값 변경 ${m.changed} · 결과값만 ${m.derivedOnly} · 함께 갱신 ${m.quiet}</span></div>
+                    <div class="mods__head">수정 내용 <span>수정 ${m.changed} · 결과값만 ${m.derivedOnly} · 함께 갱신 ${m.quiet}${m.restored ? ` · 변경 후 되돌림 ${m.restored}` : ""}</span></div>
                     ${groups.length ? `<p class="mods__chips">${groups.map((g) => `<span>${escapeHtml(g.group)} <b>${g.count}</b></span>`).join("")}</p>` : ""}
                     ${m.lines.length ? `<ul>${m.lines.slice(0, 6).map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ul>` : ""}
                 </div>`;

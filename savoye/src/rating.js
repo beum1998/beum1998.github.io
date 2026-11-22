@@ -134,7 +134,8 @@ export function mountRating(host, { kind, id, meta = {} }) {
 const CSV_HEADER = [
     "kind", "target_id", "title", "timestamp", "range_from", "range_to",
     "model", "summarized_at", "verdict", "rated_at", "comment",
-    "numbers_matched", "numbers_unverified", "numbers_mismatched", "summary_text",
+    "numbers_matched", "numbers_unverified", "numbers_mismatched",
+    "numbers_matched_bound", "numbers_matched_unbound", "summary_text",
 ];
 
 export function ratingsCsv() {
@@ -150,7 +151,9 @@ export function ratingsCsv() {
             m.model, m.summarizedAt ? new Date(m.summarizedAt).toISOString() : "",
             r.verdict || "", r.at ? new Date(r.at).toISOString() : "",
             r.comment || "",
-            m.check?.ok ?? "", m.check?.unv ?? "", m.check?.bad ?? "",
+            // 일치는 항목에 묶인 일치와 값만 일치를 따로 적는다(예전 평가에는 구분이 없어 합만 있다)
+            m.check ? (m.check.ok ?? 0) + (m.check.any ?? 0) : "", m.check?.unv ?? "", m.check?.bad ?? "",
+            m.check?.any == null ? "" : m.check.ok ?? 0, m.check?.any ?? "",
             m.summary || "",
         ].map(csvCell).join(","));
     }

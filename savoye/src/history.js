@@ -14,9 +14,9 @@
 import { Color } from "three";
 import { store, on, emit, catInfo, levelOf, formatKey, escapeHtml, onProjectReset, LAB } from "./store.js";
 import { icon } from "./icons.js";
-import { diffElementVersionsFromLists } from "./script/diffView.js";
 import { captureViews, DEFAULT_DIR } from "./shoot.js";
-import { mountPinSummary, getPinSummary, mountProjectSummary, getProjectSummary } from "./aiSummary.js";
+import { mountPinSummary, getPinSummary, mountProjectSummary, getProjectSummary, diffBetween } from "./aiSummary.js";
+import { pinRange } from "./segment.js";
 import { downloadHistoryReport, downloadBackup, readBackupFile, restoreBackup, ratingLine } from "./report.js";
 import { downloadRatings } from "./rating.js";
 import { refreshPins } from "./pins.js";
@@ -278,7 +278,8 @@ export function initHistory() {
         if (isLast && order === "asc") return "";
         const weight = Math.min(8, 2 + Math.round((s.events / maxEvents) * 6));
         const bits = [fmtDuration(s.gapMs), `편집 ${s.rework.edits.toLocaleString()}회`];
-        if (s.rework.reverted) bits.push(`되돌림 ${s.rework.reverted}`);
+        if (s.rework.reverted) bits.push(`생성 후 삭제 ${s.rework.reverted}`);
+        if (s.rework.outside) bits.push(`범위 밖 ${s.rework.outside} 세지 않음`);   // 모델 범위 밖에서 만들고 지운 요소
         if (s.recs.length) bits.push(`녹음 ${s.recs.length}개`);
         return `
             <div class="hgap">
@@ -339,17 +340,11 @@ export function initHistory() {
     function shoot(pin) {
         let tint = null;
         if (highlightAdded) {
-            const prev = prevPin(pin);
-            const diff = diffBetweenIndexes(prev ? prev.index : 0, pin.index);
+            const { from } = pinRange(pin);   // 첫 핀은 빈 모델에서 시작한다
+            const diff = diffBetween(from, pin.index);
             tint = new Map(diff.addedIds.map((id) => [id, ADDED_TINT]));
         }
         return captureViews({ index: pin.index, dirs: [dir], tint, size: SHOT_SIZE })[0] || null;
-    }
-
-    function diffBetweenIndexes(fromIndex, toIndex) {
-        const A = store.timeLog[store.timeKeys[fromIndex]]?.Elements || [];
-        const B = store.timeLog[store.timeKeys[toIndex]]?.Elements || [];
-        return diffElementVersionsFromLists(A, B);
     }
 
     // ── 카드별 AI 요약 ────────────────────────────────────────────────────────

@@ -193,6 +193,10 @@
                             <input class="rec-stt field field--sm field--pill" id="ai-stt-model" list="ai-stt-list" spellcheck="false"
                                    placeholder="전사 모델" title="녹음을 글로 옮길 때 쓰는 모델">
                             <datalist id="ai-stt-list"></datalist>
+                            <label class="rec-send check" hidden title="켜면 이 구간 녹음의 전사를 핀 해석 · 브리핑에 함께 보내요. 꺼 두면 Commit Message 만 설계자 설명으로 들어가요">
+                                <input type="checkbox" id="ai-send-transcript">
+                                <span>전사를 AI 해석에</span>
+                            </label>
                         </div>
                         <div id="rec-list" class="rec-list"></div>
 

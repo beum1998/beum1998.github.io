@@ -16,18 +16,15 @@
 //   되살린 요소      지워졌다가 다시 나타난 요소
 //   단명 요소        생긴 지 10분 안에 사라지고 다시 안 돌아온 요소
 //
-// 구간(핀과 핀 사이) 지표
-//   되돌림  구간 안에서 편집했는데 구간 끝(핀 시점)에는 없는 요소
-//   확정    마지막 편집이 이 구간에 있고, 끝까지 그대로 남은 요소
-//   실작업  구간 안 이벤트 사이 간격 중 10분 미만만 더한 시간(자리 비운 시간 제외)
+// 구간(핀과 핀 사이) 지표는 segment.js 가 낸다(segmentRework · segmentsCsv) — 단계의 분류가 필요해서다.
+// 여기서는 그 재료가 되는 "기록 시점마다의 단계"(stepsAt)까지만 만든다.
 //
-// 숫자는 전부 여기서 계산한다. 화면 · 보고서 · AI 는 이 값을 인용만 한다.
+// 숫자는 전부 코드가 계산한다. 화면 · 보고서 · AI 는 이 값을 인용만 한다.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { store, baseId, levelOf, catInfo, onProjectReset } from "./store.js";
 
 const SHORT_LIVED_MS = 10 * 60 * 1000;
-const IDLE_GAP_MS = 10 * 60 * 1000;
 
 let cache = null;
 onProjectReset(() => { cache = null; });
@@ -42,10 +39,13 @@ export function analyzeRework() {
     const modAt = new Uint32Array(n);
     const delAt = new Uint32Array(n);
     const lives = new Map();       // base → life
+    // 기록 시점(트랜잭션)마다의 단계 — 요소 하나에 한 시점 한 단계. 첫 시점 앞은 빈 모델로 본다
+    const stepsAt = new Array(n);  // i → [{ base, kind: "add"|"mod"|"del", id, prevId }]
     let prev = new Map();          // base → versioned id
 
     for (let i = 0; i < n; i++) {
         const cur = new Map();
+        const steps = [];
         for (const id of store.timeLog[keys[i]]?.Elements || []) cur.set(baseId(id), id);
 
         for (const [b, id] of cur) {
@@ -61,21 +61,25 @@ export function analyzeRework() {
                 life.lastChange = i;
                 life.lastId = id;
                 addAt[i]++;
+                steps.push({ base: b, kind: "add", id, prevId: null });
             } else if (before !== id) {
                 life.changes.push(i);
                 life.mods++;
                 life.lastChange = i;
                 life.lastId = id;
                 modAt[i]++;
+                steps.push({ base: b, kind: "mod", id, prevId: before });
             }
         }
-        for (const b of prev.keys()) {
+        for (const [b, id] of prev) {
             if (cur.has(b)) continue;
             const life = lives.get(b);
             const span = life.spans[life.spans.length - 1];
             span[1] = i - 1;
             delAt[i]++;
+            steps.push({ base: b, kind: "del", id: null, prevId: id });
         }
+        stepsAt[i] = steps;
         prev = cur;
     }
 
@@ -112,57 +116,13 @@ export function analyzeRework() {
         n,
         lives,
         addAt, modAt, delAt,
+        stepsAt,
         totals,
         byLevelCat: groupByLevelCat(lives),
         topRevised: [...lives.values()].sort((a, b) => b.mods - a.mods || b.edits - a.edits).slice(0, 12),
     };
     cache = { keys, n, result };
     return result;
-}
-
-/** 핀과 핀 사이(from, to] 구간의 편집 · 되돌림 · 확정 · 실작업 시간 */
-export function segmentRework(from, to) {
-    const R = analyzeRework();
-    const lo = Math.max(0, from);
-    const hi = Math.min(R.n - 1, to);
-
-    let add = 0, mod = 0, del = 0, activeMs = 0, lastEvent = lo;
-    for (let i = lo + 1; i <= hi; i++) {
-        const e = R.addAt[i] + R.modAt[i] + R.delAt[i];
-        add += R.addAt[i];
-        mod += R.modAt[i];
-        del += R.delAt[i];
-        if (e > 0) {
-            const gap = store.keyMs[i] - store.keyMs[lastEvent];
-            if (gap > 0 && gap < IDLE_GAP_MS) activeMs += gap;
-            lastEvent = i;
-        }
-    }
-    // 첫 구간은 0번 스냅샷의 추가도 포함한다
-    if (lo === 0 && from <= 0) add += R.addAt[0];
-
-    const present = new Set((store.timeLog[store.timeKeys[hi]]?.Elements || []).map(baseId));
-    let reverted = 0, revertedEdits = 0, settled = 0;
-    for (const life of R.lives.values()) {
-        let inRange = 0;
-        for (const i of life.changes) if (i > from && i <= hi) inRange++;
-        if (from <= 0) for (const i of life.changes) if (i === 0) inRange++;
-        if (inRange && !present.has(life.base)) { reverted++; revertedEdits += inRange; }
-        if (life.alive && life.lastChange <= hi && (life.lastChange > from || (from <= 0 && life.lastChange === 0))) settled++;
-    }
-
-    const edits = add + mod;
-    return {
-        add, mod, del,
-        events: add + mod + del,
-        edits,
-        reverted,
-        revertedEdits,
-        keptEdits: Math.max(0, edits - revertedEdits),
-        settled,
-        activeMs,
-        spanMs: (store.keyMs[hi] ?? 0) - (store.keyMs[lo] ?? 0),
-    };
 }
 
 /** 요소 하나의 수명 (요소 수명선 · 툴팁 · CSV) */
@@ -233,25 +193,8 @@ export function elementsCsv() {
     return lines.join("\r\n");
 }
 
-/** 핀 구간별 CSV */
-export function segmentsCsv() {
-    const head = ["pin_order", "pin_id", "title", "stage", "source", "timestamp", "from_index", "to_index",
-        "span_minutes", "active_minutes", "events", "adds", "modifications", "deletions",
-        "reverted_elements", "reverted_edits", "settled_elements"];
-    const lines = [head.join(",")];
-    store.pins.forEach((pin, i) => {
-        const from = i > 0 ? store.pins[i - 1].index : 0;
-        const s = segmentRework(from, pin.index);
-        lines.push([
-            i + 1, pin.id, pin.title, pin.stage, pin.source, pin.ts, from, pin.index,
-            (s.spanMs / 60000).toFixed(1), (s.activeMs / 60000).toFixed(1),
-            s.events, s.add, s.mod, s.del, s.reverted, s.revertedEdits, s.settled,
-        ].map(cell).join(","));
-    });
-    return lines.join("\r\n");
-}
-
-function cell(v) {
+/** CSV 한 칸 (segment.js 의 구간별 CSV 도 쓴다) */
+export function cell(v) {
     const s = v === undefined || v === null ? "" : String(v).replace(/\r?\n/g, " ");
     return /[",]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }

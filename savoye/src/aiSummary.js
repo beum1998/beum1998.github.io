@@ -12,28 +12,37 @@
 //                  다섯 장(+ 이전 핀 정면 한 장)과 함께 요약
 //   3) 브리핑 · 녹음 · 프로젝트 서술
 //   핀 · 비교는 바뀐 층의 변경 전 · 후 평면도 함께 보낸다(수직 요소가 바뀌면 인접 층까지).
+//   핀은 그 층에서 구간 안에 만들고 지운 요소가 있으면 그것을 그린 평면도 한 장 더 보낸다.
+//
+// 구간의 분류와 수치(수정됨 · 결과값만 변경 · 함께 갱신 · 경로 수치 · 변경 순서 · 전파 표시)는
+// segment.js 한곳에서 나온다. 여기서는 그것을 AI 에 보낼 모양으로 옮기기만 한다.
 //
 // 결과 형식(모든 진입점 공통) — 사실과 해석을 나눈다
 //   Observed Change           로그 · 수치 · 도면에서 직접 확인되는 것
 //   Spatial Impact            층 · 방위 · 공간 구성 · 물량에 미친 영향
 //   Inferred Design Decision  위 둘을 근거로 한 해석 + 근거 · 확신
 //
+// 숫자의 키 — 숫자 검사가 답변의 숫자를 어느 계산 항목과 견줄지 답변이 직접 밝히게 한다
+//   · 보내는 데이터의 숫자마다 바로 뒤에 키가 붙는다: "추가":"56[#k3]" (numberCheck.keyContext)
+//   · 지시문은 데이터의 숫자를 쓸 때 그 키를 숫자 뒤에 그대로 옮기라고 한다: "벽 56[#k3]개 추가"
+//   · 저장은 두 벌 — html(키를 지운 글, 화면 · 보고서 · 평가가 읽는다)과 keyed(키가 붙은 글, 숫자 검사가 읽는다)
+//   화면에 보이는 글은 키가 없던 때와 같다. 키가 없는 숫자는 숫자 검사가 둘레의 낱말로 묶는다.
+//
 // API 키는 기존 비교 화면(compare.html)과 같은 브라우저 저장소를 쓴다.
 // 요약을 누를 때만 외부로 전송되며, 그 외 기능은 모두 오프라인으로 동작한다.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Color } from "three";
-import { store, on, catInfo, levelOf, formatKey, escapeHtml, baseId, LAB } from "./store.js";
+import { store, on, catInfo, levelOf, formatKey, escapeHtml, LAB } from "./store.js";
 import { icon } from "./icons.js";
 import { pinAtIndex } from "./pins.js";
-import { diffElementVersionsFromLists } from "./script/diffView.js";
-import { captureViews, captureLevelPlans, planLevels, planLevelOf, VIEWS } from "./shoot.js";
+import { captureViews, captureLevelPlans, planLevels, planLevelOf, inLevelPlan, VIEWS } from "./shoot.js";
 import { expand, morph } from "./motion.js";
 import { mountRating, plainText, getRating, VERDICTS, VERDICT_TONE } from "./rating.js";
 import { safeHtml } from "./sanitize.js";
-import { summarizeModifications, diffVersions, headline } from "./changeDiff.js";
-import { segmentRework } from "./rework.js";
-import { collectFacts, checkNumbers, checkBarHtml, checkTagHtml, wireCheckToggle } from "./numberCheck.js";
+import { summarizeModifications } from "./changeDiff.js";
+import { segmentAccount, segmentRework, classifyDiff, changeSequence, pinRange, sequenceRows } from "./segment.js";
+import { collectFacts, keyContext, stripKeys, checkNumbers, checkBarHtml, checkTagHtml, wireCheckToggle } from "./numberCheck.js";
 
 const KEY_STORAGE = "openai_api_key";   // 기존 비교 화면과 같은 키
 const MODEL_STORAGE = "abl_ai_model";
@@ -59,6 +68,7 @@ const IMAGE_WIDTH = 640;
 const TRANSCRIBE_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
 const TRANSCRIBE_STORAGE = "abl_ai_stt_model";
 const TRANSCRIPT_STORAGE = "abl_rec_transcripts";
+const SEND_TRANSCRIPT_STORAGE = "abl_ai_send_transcript";
 const DEFAULT_TRANSCRIBE = "gpt-transcribe";
 export const TRANSCRIBE_PRESETS = [
     { id: "gpt-transcribe", label: "GPT-Transcribe — 고정확도 (기본)" },
@@ -129,11 +139,16 @@ async function fetchModelList(apiKey) {
 }
 
 // ── 근거 데이터 ──────────────────────────────────────────────────────────────
+/**
+ * 두 기록 시점 사이의 순변화(분류된 차이, segment.js). fromIndex = −1 은 빈 모델.
+ * modified 에는 수정됨(순 단계가 입력 값 변경)만 있고, 결과값만 변경 · 바꿨다 되돌림 · 함께 갱신은
+ * derivedOnly · restored · incidental 에 따로 있다. 캐시된 값이니 고치지 말 것.
+ */
 export function diffBetween(fromIndex, toIndex) {
-    const A = store.timeLog[store.timeKeys[fromIndex]]?.Elements || [];
-    const B = store.timeLog[store.timeKeys[toIndex]]?.Elements || [];
-    return diffElementVersionsFromLists(A, B);
+    return segmentAccount(fromIndex, toIndex).diff;
 }
+
+export { changeSequence, pinRange };
 
 function levelRows(diff) {
     const rows = new Map();
@@ -193,94 +208,41 @@ function sampleElements(ids, limit = 8) {
     return out;
 }
 
-// ── 변경 순서 ────────────────────────────────────────────────────────────────
-/**
- * from → to 사이 변경을 시간 순서대로. 연속한 두 기록 시점의 차이를 층 · 카테고리 · 종류로 세고,
- * 같은 묶음이 이어지면 한 단계로 합친다(벽 12개를 하나씩 옮긴 12번의 기록 → "벽 수정 12" 한 단계).
- * 수정은 첫 요소의 값 변화 한 줄을 예로 단다. 단계가 너무 많으면 큰 단계만 남기고 순서는 지킨다.
- */
-export function changeSequence(from, to, limit = 24) {
-    const at = (i) => {
-        const m = new Map();
-        for (const id of store.timeLog[store.timeKeys[i]]?.Elements || []) m.set(baseId(id), id);
-        return m;
-    };
-    const lo = Math.max(0, Math.min(from, to)), hi = Math.max(from, to);
-    const steps = [];
-    let prev = at(lo);
-    for (let i = lo + 1; i <= hi; i++) {
-        const cur = at(i);
-        const tally = new Map();
-        const add = (kind, id, prevId) => {
-            const g = store.meshDict[id];
-            const lv = levelOf(g?.userData).name;
-            const cat = catInfo(g?.userData?.Common?.ElementCategory).label;
-            const key = `${kind}|${lv}|${cat}`;
-            if (!tally.has(key)) tally.set(key, { kind, lv, cat, n: 0, example: null });
-            const t = tally.get(key);
-            t.n++;
-            if (kind === "수정" && !t.example) {
-                const d = diffVersions(prevId, id);
-                if (!d.quiet) t.example = headline(d, 1);
-            }
-        };
-        for (const [b, id] of cur) {
-            const p = prev.get(b);
-            if (p === undefined) add("추가", id);
-            else if (p !== id) add("수정", id, p);
-        }
-        for (const [b, id] of prev) if (!cur.has(b)) add("삭제", id);
-        prev = cur;
-        if (!tally.size) continue;
-
-        const sig = [...tally.keys()].sort().join(",");
-        const last = steps[steps.length - 1];
-        if (last && last.sig === sig) {
-            for (const [k, t] of tally) {
-                const e = last.items.get(k);
-                e.n += t.n;
-                e.example ||= t.example;
-            }
-            last.to = i;
-        } else {
-            steps.push({ sig, from: i, to: i, items: tally });
-        }
-    }
-
-    const weight = (s) => [...s.items.values()].reduce((a, t) => a + t.n, 0);
-    let kept = steps;
-    if (steps.length > limit) {
-        const big = new Set([...steps].sort((a, b) => weight(b) - weight(a)).slice(0, limit));
-        kept = steps.filter((s) => big.has(s));
-    }
-    const when = (s) => {
-        const a = formatKey(store.timeKeys[s.from]), b = formatKey(store.timeKeys[s.to]);
-        if (a.short === b.short) return a.short;
-        return a.date === b.date ? `${a.short} ~ ${b.time.slice(0, 5)}` : `${a.short} ~ ${b.short}`;
-    };
-    return {
-        단계: kept.map((s) => ({
-            시각: when(s),
-            변경: [...s.items.values()].map((t) => `${t.lv} ${t.cat} ${t.kind} ${t.n}${t.example ? ` (${t.example})` : ""}`),
-        })),
-        생략한_작은_단계: steps.length - kept.length,
-    };
-}
-
 // ── 층 평면 ─────────────────────────────────────────────────────────────────
 const DELETED = 0xef4444;
 const PLAN_MAX_LEVELS = 2;
 // 층을 가로지르는 요소 — 이것이 바뀌면 위 · 아래 층 평면도 함께 본다
 const VERTICAL_CATS = new Set(["Stairs", "Columns", "Structural Columns", "Floors", "Curtain Walls", "Railings"]);
+/** 만들고 지운 요소를 그린 평면의 이름 끝(이미지 설명 · 근거 · 화면이 같은 말을 쓴다) */
+export const TRIAL_PLAN_LABEL = "만들고 지운 요소";
 
 /**
- * 바뀐 층의 변경 전 · 후 평면. 요소가 많이 바뀐 층부터 두 개까지.
- * 계단 · 기둥 · 바닥처럼 층을 잇는 요소가 바뀌었으면 가장 많이 바뀐 층의 위 · 아래 층(현재 시점)도 넣는다.
- * 색: 이전 평면은 삭제 빨강 · 수정 주황, 현재 평면은 추가 초록 · 수정 주황.
- * @returns {{ images: string[], labels: string[], info: object[], levels: object[] }}
- *   levels: 층마다 { key, name, role, before, after } — 화면에 층 순서대로 그릴 때 쓴다
+ * 만들고 지운 요소를 칠하는 색 — tokens.css 의 pin 톤(보라)을 그대로 읽는다(화면 범례의 tone-pin 과 같은 값).
+ * 추가 초록 · 수정 주황 · 삭제 빨강과 겹치지 않는 색이어야 하고, 지시문(PLAN_NOTE)이 이 색을 "보라"라고 부른다.
  */
-function planShots(fromIndex, toIndex, diff) {
+function trialColor() {
+    try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue("--pin").trim();
+        if (v) return new Color(v);
+    } catch { }
+    return new Color(0x7c5cff);
+}
+
+/**
+ * 바뀐 층의 변경 전 · 후 평면(diff 는 분류된 차이). 추가 · 삭제 · 수정된 요소와, 구간 안에서 만들고 지운 요소
+ * (trialIds, 지워지기 전 마지막 버전)를 합쳐 많은 층부터 두 개까지.
+ * 그 층에 만들고 지운 요소가 있으면 한 장 더 찍는다 — 구간 끝의 배치를 회색으로 깔고 그 요소만 칠한다.
+ * 그 요소는 구간 양 끝에 없으므로 이전 · 현재 평면에는 나오지 않는다. 이전 · 현재는 서로 같은 틀이고, 이 평면은
+ * 그 요소가 다 들어오게 틀을 따로 잡는다(건물 밖에 놓였던 요소 때문에 이전 · 현재 평면이 작아지지 않게).
+ * 계단 · 기둥 · 바닥처럼 층을 잇는 요소가 바뀌었으면 가장 많이 바뀐 층의 위 · 아래 층(현재 시점)도 넣는다.
+ * 색: 이전 평면은 삭제 빨강 · 수정 주황, 현재 평면은 추가 초록 · 수정 주황, 만들고 지운 요소는 보라.
+ * 만들고 지운 요소 가운데 평면에 그리는 것은 그 층의 자르는 높이에 걸리고 모델 범위 안에 놓였던 것뿐이다
+ * (shoot.inLevelPlan). 지붕 · 천장, 모델에서 멀리 떨어져 놓였던 요소는 그리지 않고, info 의 수에도 넣지 않는다.
+ * @returns {{ images: string[], labels: string[], info: object[], levels: object[] }}
+ *   info: 층마다 { 층, 같은_높이의_레벨, 역할, 변경_요소_수, 만들고_지운_요소_수? } — 뒤의 수는 그 평면에 그린 요소 수
+ *   levels: 층마다 { key, name, role, before, after, trial } — 화면에 층 순서대로 그릴 때 쓴다(trial 은 없으면 null)
+ */
+function planShots(fromIndex, toIndex, diff, trialIds = []) {
     const out = { images: [], labels: [], info: [], levels: [] };
     const levels = planLevels();
     if (!levels.length || !store.viewer) return out;
@@ -295,7 +257,18 @@ function planShots(fromIndex, toIndex, diff) {
     diff.addedIds.forEach(bump);
     diff.deletedIds.forEach(bump);
     diff.modified.after.forEach(bump);
-    const changed = [...count].sort((a, b) => b[1] - a[1]).slice(0, PLAN_MAX_LEVELS).map(([k]) => k);
+    // 만들고 지운 요소가 서 있던 평면 층 — 순변화가 없는 층이라도 시도가 있었으면 평면을 고를 때 함께 센다.
+    // 그 층 평면에 실제로 그려지는 것만 센다(자르는 높이에 걸리지 않거나 모델에서 멀리 떨어져 놓였던 요소는 뺀다)
+    const trial = new Map();
+    for (const id of trialIds) {
+        const k = planLevelOf(id);
+        if (!k || !inLevelPlan(id, k)) continue;
+        if (!trial.has(k)) trial.set(k, []);
+        trial.get(k).push(id);
+    }
+    const weight = (k) => (count.get(k) || 0) + (trial.get(k)?.length || 0);
+    const changed = [...new Set([...count.keys(), ...trial.keys()])]
+        .sort((a, b) => weight(b) - weight(a)).slice(0, PLAN_MAX_LEVELS);
     if (!changed.length) return out;
 
     const tintOf = (pairs) => {
@@ -305,6 +278,7 @@ function planShots(fromIndex, toIndex, diff) {
     };
     const beforeTint = tintOf([[diff.deletedIds, DELETED], [diff.modified.before, MODIFIED]]);
     const afterTint = tintOf([[diff.addedIds, ADDED], [diff.modified.after, MODIFIED]]);
+    const purple = trialColor();
     const nameOf = (k) => levels.find((l) => l.key === k)?.name || k;
     const namesOf = (k) => levels.find((l) => l.key === k)?.names || [k];
 
@@ -313,11 +287,27 @@ function planShots(fromIndex, toIndex, diff) {
             levelKey: k,
             shots: [{ index: fromIndex, tint: beforeTint }, { index: toIndex, tint: afterTint }],
         });
-        if (!before || !after) continue;
-        out.images.push(before, after);
-        out.labels.push(`${nameOf(k)} 평면 — 이전`, `${nameOf(k)} 평면 — 현재`);
-        out.info.push({ 층: nameOf(k), 같은_높이의_레벨: namesOf(k), 역할: "변경 층", 변경_요소_수: count.get(k) });
-        out.levels.push({ key: k, name: nameOf(k), role: "변경 층", before, after });
+        // 만들고 지운 요소의 평면은 따로 찍는다 — 그 요소가 건물에서 떨어진 곳에 놓였더라도 이전 · 현재 평면의 틀(축척)은
+        // 그대로 두고, 이 평면만 그 요소가 다 들어오게 넓힌다. 위치는 회색으로 깐 현재 배치에 견줘 읽는다
+        const ids = trial.get(k) || [];
+        const [tried] = ids.length
+            ? captureLevelPlans({ levelKey: k, shots: [{ index: toIndex, extra: ids, dim: true, tint: new Map(ids.map((id) => [id, purple])) }] })
+            : [];
+        const paired = Boolean(before && after);   // 구간 양 끝 모두 이 층에 요소가 없으면 이전 · 현재 평면은 없다
+        if (!paired && !tried) continue;
+        if (paired) {
+            out.images.push(before, after);
+            out.labels.push(`${nameOf(k)} 평면 — 이전`, `${nameOf(k)} 평면 — 현재`);
+        }
+        if (tried) {
+            out.images.push(tried);
+            out.labels.push(`${nameOf(k)} 평면 — ${TRIAL_PLAN_LABEL}`);
+        }
+        out.info.push({
+            층: nameOf(k), 같은_높이의_레벨: namesOf(k), 역할: "변경 층", 변경_요소_수: count.get(k) || 0,
+            ...(tried ? { 만들고_지운_요소_수: ids.length } : {}),
+        });
+        out.levels.push({ key: k, name: nameOf(k), role: "변경 층", before: paired ? before : null, after: paired ? after : null, trial: tried || null });
     }
 
     if (vertical && changed.length) {
@@ -329,7 +319,7 @@ function planShots(fromIndex, toIndex, diff) {
             out.images.push(img);
             out.labels.push(`${n.name} 평면 — 현재 (인접 층)`);
             out.info.push({ 층: n.name, 같은_높이의_레벨: n.names, 역할: n === levels[i - 1] ? "아래 층" : "위 층" });
-            out.levels.push({ key: n.key, name: n.name, role: n === levels[i - 1] ? "아래 층" : "위 층", before: null, after: img });
+            out.levels.push({ key: n.key, name: n.name, role: n === levels[i - 1] ? "아래 층" : "위 층", before: null, after: img, trial: null });
         }
     }
     return out;
@@ -338,12 +328,34 @@ function planShots(fromIndex, toIndex, diff) {
 const PLAN_NOTE = "평면은 층 바닥에서 층고의 40% 높이로 수평으로 잘라 위에서 본 그림입니다(북쪽이 위). 이전·현재 평면은 같은 축척·같은 틀입니다. "
     + "이전 평면의 빨강 = 삭제될 요소, 주황 = 수정 전 요소 / 현재 평면의 초록 = 추가된 요소, 주황 = 수정 후 요소. "
     + "평면의 층은 실제 높이로 묶은 것이라, '층_카테고리별_변화'의 층 이름(로그의 레벨)과 다를 수 있습니다.";
+// 만들고 지운 요소 평면이 있을 때만 덧붙인다
+const PLAN_NOTE_TRIAL = ` '${TRIAL_PLAN_LABEL}' 평면은 구간 안에서 만들었다가 지운 요소(구간 양 끝 어디에도 없어 이전·현재 평면에는 나오지 않는 요소)를 `
+    + "지워지기 직전 모습으로 보라색으로 그린 것입니다. 회색은 현재 시점의 배치이고 위치를 가늠하는 바탕일 뿐입니다. "
+    + "그 요소가 다 들어오도록 틀을 따로 잡아 이전·현재 평면과 축척이 다를 수 있으니, 위치는 회색 바탕에 견줘 읽으세요. "
+    + "이 평면으로 그 요소가 어디에 놓였었는지 읽으세요. 만들었다가 지운 요소가 모두 버린 대안인 것은 아닙니다(잘못 넣은 것을 바로잡았거나 잠깐 쓴 보조 요소일 수 있습니다). "
+    + "구간 전체의 수는 '구간_내부_과정'에 있고, '평면_층'의 '만들고_지운_요소_수'는 그 가운데 이 평면에 그려진 수입니다. "
+    + "나머지는 지붕·천장처럼 평면에서 빼는 요소이거나, 자르는 높이에 걸리지 않거나, 지워지기 직전에 건물에서 멀리 떨어져 있던 요소여서 그리지 않았습니다.";
+
+// ── 지시문의 공통 규칙 ──────────────────────────────────────────────────────
+// 수정이 아닌 두 갱신 분류를 이름으로 부르게 한다(수정으로 세지 않게)
+const RULE_UPDATES = "'수정'은 구간 양 끝을 비교해 입력 값이 달라진 요소만 센 것입니다. '수정이_아닌_갱신'의 '결과값만 변경'(면적 · 체적처럼 계산되는 값만 달라진 요소)과 '함께 갱신'(기록된 값에 차이가 없는 갱신)은 그 이름으로 따로 적고, 수정으로 세지 마세요.";
+// 숫자마다 계산 항목의 키를 함께 내게 한다 — 숫자 검사가 낱말이 아니라 키로 대조한다(numberCheck.js)
+const RULE_KEYS = "데이터의 숫자에는 바로 뒤에 [#k12] 같은 키가 붙어 있습니다. 답변에 데이터의 숫자를 쓸 때마다 그 숫자 바로 뒤에 그 숫자의 키를 그대로 옮겨 붙이고, 단위와 조사는 키 뒤에 쓰세요"
+    + "(예: 벽 12[#k7]개 추가, 높이 3,000[#k31] mm). 타입 이름이나 예시 문장 속 숫자도 같습니다. 키는 화면에서 지워지고, 숫자를 계산된 값과 하나씩 대조하는 데만 쓰입니다. "
+    + "다른 숫자의 키를 붙이거나 키를 지어내지 말고, 데이터에 없는 숫자에는 키를 붙이지 마세요.";
+// 순서는 단계를, 수치는 요소를 센다
+const RULE_SEQUENCE ="'변경_순서'는 설계자 자신의 단계(추가 · 삭제 · 입력 값 변경)만 시간 순서로 묶은 것이고, 그 수는 요소 수가 아니라 단계 수입니다. 같은 종류 · 카테고리라도 '층_카테고리별_변화'의 요소 수와 다를 수 있습니다(벽 12개를 옮겼다 되돌리면 순서에서는 24단계, 수정된 요소는 0). '전파_가능'은 호스트(문 · 창이 붙은 벽 등)가 같은 순간 바뀌거나 지워져 함께 바뀌었을 수 있는 단계 수이니, 그 단계를 설계자가 직접 한 것으로 단정하지 마세요.";
 
 // ── 결과 형식: 관찰된 변경 · 공간적 영향 · 추론된 설계 의사결정 ────────────────
+// check 는 그 항목의 문장을 어떻게 확인하는지 알리는 꼬리표다(제목 옆에 보인다): 숫자는 계산값과 대조하고,
+// 공간 서술은 평면에 견줘 읽고, 추론은 가설로 읽는다. 항목이 꼬리표를 정한다 — 문장마다 따로 판정하지 않는다.
 export const DECISION_SECTIONS = [
-    { key: "obs", tone: "tone-accent", title: "Observed Change", re: /관찰된\s*변경|Observed\s*Change/i },
-    { key: "spa", tone: "tone-spa", title: "Spatial Impact", re: /공간적\s*영향|Spatial\s*Impact/i },
-    { key: "inf", tone: "tone-pin", title: "Inferred Design Decision", re: /추론된\s*설계\s*의사\s*결정|Inferred\s*Design\s*Decision/i },
+    { key: "obs", tone: "tone-accent", title: "Observed Change", re: /관찰된\s*변경|Observed\s*Change/i,
+        check: "숫자 검사", checkTip: "이 항목의 숫자는 계산된 값과 대조해요. 숫자가 아닌 말은 대조하지 않아요." },
+    { key: "spa", tone: "tone-spa", title: "Spatial Impact", re: /공간적\s*영향|Spatial\s*Impact/i,
+        check: "평면과 대조해 읽기", checkTip: "AI 가 평면을 읽고 쓴 서술이에요. AI 에 보낸 평면과 견줘 확인하세요." },
+    { key: "inf", tone: "tone-pin", title: "Inferred Design Decision", re: /추론된\s*설계\s*의사\s*결정|Inferred\s*Design\s*Decision/i,
+        check: "가설", checkTip: "AI 의 추론이에요. 적힌 근거와 함께 가설로 읽고, 중요한 것은 설계자에게 확인하세요." },
 ];
 
 /**
@@ -360,6 +372,7 @@ function decisionFormat({ relation, observed, spatial, inferred, length = "" }) 
     return [
         `분석은 이 순서로 하세요: ① 로그 · 수치 · 이미지에서 직접 확인되는 변경 사실을 찾고 → ② 변경들이 어떤 순서와 관계로 일어났는지 ${relation}로 묶고 → ③ 변경 전후를 비교해 주변 공간과 공간 구성에 준 영향을 파악한 뒤 → ④ 그 흐름이 어떤 설계 의사결정일 수 있는지 해석하세요.`,
         `한국어로, 아래 세 항목만 제목을 그대로 써서 작성하세요. 강조는 **굵게**만 사용하세요. 각 항목은 한두 문장의 도입 뒤에 '- '로 시작하는 글머리로 나눠 쓰고, 글머리 사이에 빈 줄을 넣지 마세요. 글머리 하나는 한 줄로 끝내세요.${length ? ` ${length}` : ""}`,
+        RULE_KEYS,
         "",
         `**${obs}** — 직접 확인되는 사실만 쓰고 해석이나 의도는 섞지 마세요. 개별 변경을 나열하지 말고 관련된 변경끼리 묶어서 쓰세요. ${observed}`,
         `**${spa}** — 변경 때문에 생긴 공간적 · 정량적 영향. ${spatial}`,
@@ -368,6 +381,7 @@ function decisionFormat({ relation, observed, spatial, inferred, length = "" }) 
             + "그리고 설계자가 왜 그렇게 바꿨을지 설계 관점(동선 · 채광 · 조망 · 프라이버시 · 단열 · 구조 · 층고 등)으로 추정하세요. "
             + "예: 외벽 타입이 얇은 것으로 바뀌었다면 단열 성능을 다시 검토했을 수 있고, 한쪽 실이 넓어지고 창이 더해졌다면 그 실을 주된 거실이나 침실로 정했을 수 있다. "
             + "해석은 짧게 끝내지 말고, 공적 영역과 사적 영역의 구분, 생활 동선과 진입, 채광과 조망, 층 사이의 관계, 다음 설계 단계에 줄 영향까지 설계자의 입장에서 넓게 풀어 쓰세요. 다만 숫자와 관찰 사실은 입력에 있는 것만 쓰고, 추정은 추정이라고 밝히세요. "
+            + "해석 항목마다 설계자가 고른 대안이 무엇인지 적고, 변경 순서에 버린 대안이 보이면(만들었다 지운 것, 바꿨다 되돌린 것, 고쳐서 바꾼 것 등) 그것도 함께 적은 뒤, 왜 그렇게 했을지 이유를 적으세요. 만들었다 지운 요소나 바꿨다 되돌린 요소가 모두 버린 대안인 것은 아니니(잘못 넣은 것을 바로잡았거나 잠깐 쓴 보조 요소일 수 있습니다), 순서와 평면이 뒷받침할 때만 버린 대안으로 적으세요. 버린 대안이 순서에 보이지 않으면 지어내지 마세요. "
             + `추정은 '~로 보인다', '~일 수 있다'로 쓰고, 해석마다 끝에 '(근거: 어떤 관찰 · 영향 · 확신 높음/중간/낮음)'을 붙이세요. 여러 해석이 가능하면 함께 쓰고, 근거가 부족하면 부족하다고 쓰세요. ${inferred}`,
     ].join("\n");
 }
@@ -388,7 +402,7 @@ export function sectionize(html) {
     const lead = trim(html.slice(0, hits[0].start));
     return (lead ? `<div class="aisec__lead">${blockify(lead)}</div>` : "") + hits.map((h, i) => `
         <section class="aisec aisec--${h.sec.key} ${h.sec.tone}">
-            <div class="aisec__head"><span class="aisec__tag tag">${h.sec.title}</span></div>
+            <div class="aisec__head"><span class="aisec__tag tag">${h.sec.title}</span><span class="aisec__check" title="${h.sec.checkTip}">${h.sec.check}</span></div>
             <div class="aisec__body">${blockify(trim(html.slice(h.end, hits[i + 1]?.start ?? html.length)))}</div>
         </section>`).join("");
 }
@@ -427,25 +441,34 @@ function timeLabel(key) {
 }
 
 // ── 요청 ─────────────────────────────────────────────────────────────────────
+const SYSTEM_MESSAGE = "너는 BIM 설계 변경을 해석하는 조수다. 수치는 주어진 값만 쓰고 직접 계산하지 않는다. 데이터의 숫자를 쓸 때는 그 숫자에 붙은 키를 함께 옮긴다. 관찰한 사실과 추론을 섞지 않고, 추론에는 근거와 확신 정도를 밝힌다.";
+const TEMPERATURE = 0.2;
+const IMAGE_DETAIL = "low";
+
+/**
+ * 데이터는 숫자마다 키를 붙인 사본으로 보낸다(numberCheck.keyContext) — 키의 번호는 collectFacts(context) 의 순서와 같다.
+ * @returns {{ text: string, settings: object }}
+ *   text = 답변 그대로(숫자 뒤에 키가 붙어 있다 — 화면에 쓸 때는 stripKeys, 숫자 검사에는 그대로)
+ *   settings = 실제로 받아들여진 요청의 모델 설정(모델 이름 · 요청 매개변수) — 서술과 함께 저장한다
+ */
 async function ask(apiKey, instructions, context, images) {
-    const content = [{ type: "text", text: `${instructions}\n\n데이터: ${JSON.stringify(context)}` }];
+    const content = [{ type: "text", text: `${instructions}\n\n데이터: ${JSON.stringify(keyContext(context).data)}` }];
     for (const url of images) {
-        if (url) content.push({ type: "image_url", image_url: { url, detail: "low" } });
+        if (url) content.push({ type: "image_url", image_url: { url, detail: IMAGE_DETAIL } });
     }
     const model = getModel();
     const messages = [
-        {
-            role: "system",
-            content: "너는 BIM 설계 변경을 해석하는 조수다. 수치는 주어진 값만 쓰고 직접 계산하지 않는다. 관찰한 사실과 추론을 섞지 않고, 추론에는 근거와 확신 정도를 밝힌다.",
-        },
+        { role: "system", content: SYSTEM_MESSAGE },
         { role: "user", content },
     ];
 
     // 추론 계열 모델은 temperature 를 받지 않는다 → 거절당하면 빼고 한 번 더
-    let res = await send({ model, messages, temperature: 0.2 });
+    let temperature = TEMPERATURE;
+    let res = await send({ model, messages, temperature });
     if (!res.ok && res.status === 400) {
         const text = await res.clone().text();
         if (/temperature|unsupported_value|unsupported_parameter/i.test(text)) {
+            temperature = null;
             res = await send({ model, messages });
         }
     }
@@ -462,7 +485,17 @@ async function ask(apiKey, instructions, context, images) {
         throw new Error(`요청 실패 (${res.status}) ${text.slice(0, 140)}`);
     }
     const data = await res.json();
-    return data?.choices?.[0]?.message?.content?.trim() || "";
+    return {
+        text: data?.choices?.[0]?.message?.content?.trim() || "",
+        settings: {
+            엔드포인트: ENDPOINT,
+            모델: model,
+            응답이_밝힌_모델: typeof data?.model === "string" ? data.model : null,
+            매개변수: { temperature, 이미지_detail: IMAGE_DETAIL },   // temperature null = 모델이 받지 않아 빼고 보냄
+            이미지_수: images.filter(Boolean).length,
+            시스템_메시지: SYSTEM_MESSAGE,
+        },
+    };
 
     function send(body) {
         return fetch(ENDPOINT, {
@@ -477,6 +510,17 @@ export function renderMarkdown(text) {
     return escapeHtml(text)
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/\n/g, "<br>");
+}
+
+/**
+ * 답변을 저장할 두 벌로 — html 은 키를 지운 글(화면 · 보고서 · 평가가 읽는다), keyed 는 키가 붙은 글(숫자 검사가 읽는다).
+ * 답변에 키가 하나도 없으면 keyed 는 두지 않는다.
+ */
+function answerHtml(text) {
+    const answer = text || "요약을 받지 못했어요.";
+    const html = renderMarkdown(stripKeys(answer));
+    const keyed = renderMarkdown(answer);
+    return keyed === html ? { html } : { html, keyed };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -578,6 +622,7 @@ export async function summarizeRecording(rec) {
                 삭제: diff.deletedIds.length,
                 수정: diff.modified.after.length,
             },
+            수정이_아닌_갱신: updatesContext(diff),
             층_카테고리별: levelRows(diff),
             물량_변화: quantityDeltas(fromKey, toKey),
             수정_내용: modsContext(diff),
@@ -596,6 +641,8 @@ export async function summarizeRecording(rec) {
         "숫자는 이미 계산된 값입니다. 그대로 인용하고, 직접 계산하거나 없는 수치를 지어내지 마세요.",
         "전사에는 잡담이나 잘못 들린 부분이 섞일 수 있습니다. 설계와 무관한 내용은 빼세요.",
         "전사는 설계자의 말이지 모델의 사실이 아닙니다. 관찰된 변경에는 모델 변화만 쓰고, 말한 내용은 추론의 근거로만 쓰세요.",
+        RULE_UPDATES,
+        RULE_SEQUENCE,
         "",
         decisionFormat({
             relation: "'변경_순서'(시간 순)와 말한 순서",
@@ -605,8 +652,9 @@ export async function summarizeRecording(rec) {
         }),
     ].join("\n");
 
-    const text = await ask(apiKey, instructions, context, []);
-    return { html: renderMarkdown(text || "요약을 받지 못했어요."), transcript, facts: collectFacts(context) };
+    const { text } = await ask(apiKey, instructions, context, []);
+    // html 은 키를 지운 글, keyed 는 키가 붙은 글(있을 때만) — 숫자 검사에 keyed 를 넘기면 키로 대조한다
+    return { ...answerHtml(text), transcript, facts: collectFacts(context) };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -614,6 +662,7 @@ export async function summarizeRecording(rec) {
 //    요약은 핀에 붙어 저장되어, 나중에 다시 열어도 그대로 남는다.
 // ─────────────────────────────────────────────────────────────────────────────
 const PIN_SUMMARY_STORAGE = "abl_pin_summaries";
+const EMPTY_START_LABEL = "기록 시작 전 (빈 모델)";
 
 function pinSummaryStore() {
     try { return JSON.parse(localStorage.getItem(PIN_SUMMARY_STORAGE) || "{}"); } catch { return {}; }
@@ -633,25 +682,59 @@ export function clearPinSummary(pinId) {
 }
 
 /**
- * 구간 끝 비교(순변화)에서는 사라지는 구간 안의 과정.
- *   생성 후 삭제 — 구간 안에서 만들었다가 구간 끝 전에 지운 객체(rework.js 의 되돌림)
- *   추가 후 다시 수정 — 구간 시작에 없던 객체가 끝에 2번째 이후 버전으로 남은 것(추가만으로 보이지만 고쳐진 것)
+ * 경로 수치 — 구간 끝 비교(순변화)에는 보이지 않는 구간 안의 과정. 압축하기 전의 전체 순서에서 센다(segment.js).
+ *   생성 후 삭제(만들고 지움)       구간 시작에 없고, 구간 안에서 추가되고, 구간 끝에 없는 요소
+ *   변경 후 되돌림(바꿨다 되돌림)   양 끝에 있고 순 단계에 차이가 없으며, 중간에 설계자 자신의 단계가 있는 요소
+ *   추가 후 다시 수정(추가 뒤 고침) 구간 시작에 없고 끝에 있으며, 마지막으로 추가된 뒤 입력 값 변경이 있었던 요소
+ * 층_카테고리별 은 셋을 층 × 카테고리로 나눈 것이다(칸의 합 = 구간 전체 수). 층은 '층_카테고리별_변화'와 같은
+ * 로그의 레벨이고, 만들고 지운 요소는 지워지기 전 마지막 버전의 레벨 · 카테고리로 센다.
  */
-export function segmentProcess(fromIndex, toIndex, diff = diffBetween(fromIndex, toIndex)) {
-    const r = segmentRework(fromIndex, toIndex);
-    const version = (id) => Number(String(id).slice(String(id).lastIndexOf("_") + 1)) || 1;
+export function segmentProcess(fromIndex, toIndex) {
+    const { path, pathRows } = segmentAccount(fromIndex, toIndex);
     return {
-        생성_후_삭제된_객체: r.reverted,
-        그_객체의_편집_수: r.revertedEdits,
-        추가_후_다시_수정된_객체: diff.addedIds.filter((id) => version(id) > 1).length,
+        생성_후_삭제된_객체: path.createdRemoved,
+        변경_후_되돌린_객체: path.restored,
+        추가_후_다시_수정된_객체: path.addedRevised,
+        층_카테고리별: pathRows.map((r) => ({
+            층: r.lv,
+            카테고리: r.cat,
+            생성_후_삭제된_객체: r.createdRemoved,
+            변경_후_되돌린_객체: r.restored,
+            추가_후_다시_수정된_객체: r.addedRevised,
+        })),
     };
 }
 
-/** 이 핀이 덮는 구간(이전 핀 → 이 핀) */
-export function pinRange(pin) {
-    let prev = null;
-    for (const p of store.pins) if (p.index < pin.index) prev = p;
-    return { prev, from: prev ? prev.index : 0, to: pin.index };
+/**
+ * 모델 범위 밖에서 만들고 지운 요소(segment.js 의 outside) — 구간의 계산에서 뺐고 AI 에는 보내지 않는다(수도 보내지 않는다).
+ * 저장하는 근거에만 그 수를 남긴다 — 무엇을 세지 않았는지 나중에 확인할 수 있게. 없으면 칸을 만들지 않는다.
+ * 숫자 검산의 사실(facts)은 AI 에 보낸 데이터에서만 뽑으므로 이 수는 검산의 기준이 되지 않는다.
+ */
+function outsideEvidence(fromIndex, toIndex) {
+    const out = segmentAccount(fromIndex, toIndex).outside;
+    return out?.elements ? { 세지_않은_범위_밖_요소: { 요소_수: out.elements, 자신의_단계_수: out.steps } } : {};
+}
+
+/** 수정이 아닌 두 갱신 분류 — 구간 전체 수(층 × 카테고리로 나누지 않는다) */
+function updatesContext(diff) {
+    return {
+        결과값만_바뀐_요소: diff.derivedOnly?.after.length ?? 0,
+        함께_갱신된_요소: diff.incidental?.after.length ?? 0,
+    };
+}
+
+// ── 녹음 전사를 AI 해석에 보낼지 ─────────────────────────────────────────────
+// 기본은 보내지 않는다 — Commit Message(핀 제목 · 메모 · 단계)가 서술에 들어가는 유일한 설계자 설명이다.
+// 실험 기능(?lab=1)에서만 켤 수 있고, 켜 둔 채로 평소 화면을 열어도 보내지 않는다.
+export function getSendTranscripts() {
+    if (!LAB) return false;
+    try { return localStorage.getItem(SEND_TRANSCRIPT_STORAGE) === "1"; } catch { return false; }
+}
+export function setSendTranscripts(on) {
+    try {
+        if (on) localStorage.setItem(SEND_TRANSCRIPT_STORAGE, "1");
+        else localStorage.removeItem(SEND_TRANSCRIPT_STORAGE);
+    } catch { }
 }
 
 /**
@@ -660,32 +743,38 @@ export function pinRange(pin) {
  */
 export function buildPinInput(pin) {
     const { prev, from: fromIndex } = pinRange(pin);
-    const fromKey = store.timeKeys[fromIndex];
+    const fromKey = fromIndex < 0 ? null : store.timeKeys[fromIndex];   // 첫 구간은 빈 모델에서 시작한다
     const toKey = store.timeKeys[pin.index];
-    const diff = diffBetween(fromIndex, pin.index);
+    const account = segmentAccount(fromIndex, pin.index);
+    const diff = account.diff;
 
     // 추가는 초록, 수정은 주황으로 칠해서 찍는다(삭제는 이 시점에 없으므로 보이지 않는다)
+    // 수정은 순 단계가 입력 값 변경인 요소만 — 결과값만 변경 · 함께 갱신은 칠하지 않는다
     const tint = new Map();
     for (const id of diff.addedIds) tint.set(id, new Color(ADDED));
     for (const id of diff.modified.after) tint.set(id, new Color(MODIFIED));
 
     const views = captureViews({ index: pin.index, dirs: VIEWS.map((v) => v.dir), tint });
     const beforeShot = captureViews({ index: fromIndex, dirs: [VIEWS[0].dir] });
-    const plans = planShots(fromIndex, pin.index, diff);
+    // 바뀐 층의 평면 — 구간 안에서 만들고 지운 요소(양 끝에 없는 요소)도 그 층에 있으면 한 장 더 그린다
+    const plans = planShots(fromIndex, pin.index, diff, account.pathVersions.createdRemoved);
+    const hasTrialPlan = plans.levels.some((l) => l.trial);
     const images = [...views, ...beforeShot, ...plans.images];
-    const imageLabels = [...VIEWS.map((v) => `현재 시점 ${v.label}`), "이전 시점 남측(정면)", ...plans.labels];
+    const imageLabels = [...VIEWS.map((v) => `현재 시점 ${v.label}`), fromIndex < 0 ? "이전 시점 남측(정면) — 빈 모델" : "이전 시점 남측(정면)", ...plans.labels];
+    const recordings = getSendTranscripts() ? segmentRecordings(fromKey, toKey) : null;
 
     const context = {
         시점: {
-            이전: { 시각: timeLabel(fromKey), 핀: pinSummary(prev) },
+            이전: { 시각: fromIndex < 0 ? EMPTY_START_LABEL : timeLabel(fromKey), 핀: pinSummary(prev) },
             현재: { 시각: timeLabel(toKey), 핀: pinSummary(pin) },
         },
         변경_요소_수: {
             추가: diff.addedIds.length,
             삭제: diff.deletedIds.length,
             수정: diff.modified.after.length,
-            유지: diff.unchangedIds?.length ?? 0,
+            유지: diff.unchangedIds.length,
         },
+        수정이_아닌_갱신: updatesContext(diff),
         층_카테고리별_변화: levelRows(diff),
         물량_변화: quantityDeltas(fromKey, toKey),
         수정_내용: modsContext(diff),
@@ -695,34 +784,37 @@ export function buildPinInput(pin) {
             수정: sampleElements(diff.modified.after),
         },
         변경_순서: changeSequence(fromIndex, pin.index),
-        구간_내부_과정: segmentProcess(fromIndex, pin.index, diff),
+        구간_내부_과정: segmentProcess(fromIndex, pin.index),
         이미지_설명: {
             순서: imageLabels,
             색: "3D 이미지: 초록 = 이전 대비 추가된 요소, 주황 = 수정된 요소. 삭제된 요소는 현재 시점에 없으므로 보이지 않음.",
             방위: "Revit 프로젝트 북 기준",
-            ...(plans.images.length ? { 평면: PLAN_NOTE, 평면_층: plans.info } : {}),
+            ...(plans.images.length ? { 평면: PLAN_NOTE + (hasTrialPlan ? PLAN_NOTE_TRIAL : ""), 평면_층: plans.info } : {}),
         },
-        구간_녹음: segmentRecordings(fromKey, toKey),
+        ...(recordings ? { 구간_녹음: recordings } : {}),
     };
 
     const instructions = [
-        "아래는 BIM 모델에서 이전 핀 시점과 현재 핀 시점 사이의 변경입니다. 핀은 설계자가 '여기까지 한 단위의 작업'이라고 표시한 지점(Design Commit)이고, 핀 제목·메모는 설계자가 남긴 짧은 설명입니다.",
+        "아래는 BIM 모델에서 이전 핀 시점과 현재 핀 시점 사이의 변경입니다. 핀은 설계자가 '여기까지 한 단위의 작업'이라고 표시한 지점(Design Commit)이고, 핀 제목·메모는 설계자가 남긴 짧은 설명(Commit Message)입니다. 계산된 사실이 아니라 설계자가 쓴 말입니다.",
         "숫자(물량·개수·층별 변화)는 이미 계산된 값입니다. 그대로 인용하고, 직접 계산하거나 없는 수치를 지어내지 마세요.",
         `이미지는 순서대로 ${imageLabels.join(", ")} 입니다.`,
         "이미지는 형태·배치·공간 관계를 읽는 데만 쓰고, 이미지에서 수량을 세지 마세요.",
-        "'수정_내용'의 '함께 갱신'은 값이 바뀌지 않은 갱신이니 고친 것으로 세지 마세요.",
+        RULE_UPDATES,
+        RULE_SEQUENCE,
         "",
         decisionFormat({
             relation: "'변경_순서'(시간 순)",
-            observed: "추가·삭제·수정 요소 수, 층별 변화, '수정_내용'의 항목과 예시 문장, '구간_내부_과정'(구간 안에서 생성 후 삭제되거나 추가 후 다시 수정된 객체)을 숫자와 함께 3~6줄.",
-            spatial: plans.images.length
+            observed: "추가·삭제·수정 요소 수, 층별 변화, '수정_내용'의 항목과 예시 문장, 변경의 순서, '구간_내부_과정'(구간 안에서 생성 후 삭제된 객체, 변경 후 되돌린 객체, 추가 후 다시 수정된 객체. 그 안의 '층_카테고리별'은 그것이 어느 층의 어느 카테고리에서 있었는지입니다)을 숫자와 함께 3~6줄.",
+            spatial: (plans.images.length
                 ? "이전·현재 평면을 비교해 어느 층 어느 쪽(방위)에서 실 구획·통로·개구부(문·창) 배치가 어떻게 달라졌는지, 어느 실이 생기거나 넓어지거나 좁아졌는지 물량 증감과 함께 2~4줄. 인접 층 평면이 있으면 층 사이 관계(계단·기둥·수직 정렬)도 보세요."
-                : "어느 층 어느 쪽(방위)에서 형태·배치가 어떻게 달라졌는지, 물량 증감과 함께 2~4줄.",
-            inferred: "핀 제목·메모나 녹음에서 말한 내용이 있으면 해석과 대조해 맞는지 밝히고, 메모에 없는 변경은 분명히 짚으세요. 해석은 3~5개, 각각 2~3문장.",
+                : "어느 층 어느 쪽(방위)에서 형태·배치가 어떻게 달라졌는지, 물량 증감과 함께 2~4줄.")
+                + (hasTrialPlan ? ` '${TRIAL_PLAN_LABEL}' 평면이 있으면 만들었다가 지운 요소가 어느 쪽에 놓였었는지도 한 줄로 쓰세요.` : ""),
+            inferred: `핀 제목·메모${recordings ? "나 녹음에서 말한 내용" : ""}이 있으면 해석과 대조해 맞는지 밝히고, 메모에 없는 변경은 분명히 짚으세요. 해석은 3~5개, 각각 2~3문장.`
+                + (hasTrialPlan ? ` 버린 대안의 위치는 '${TRIAL_PLAN_LABEL}' 평면에 보이는 만큼만 말하세요.` : ""),
         }),
     ].join("\n");
 
-    return { prev, fromIndex, toIndex: pin.index, fromKey, toKey, diff, views, beforeShot, plans, images, imageLabels, context, instructions };
+    return { prev, fromIndex, toIndex: pin.index, fromKey, toKey, diff, account, views, beforeShot, plans, images, imageLabels, context, instructions };
 }
 
 export async function summarizePin(pin) {
@@ -730,35 +822,43 @@ export async function summarizePin(pin) {
     if (!apiKey) throw new Error("API 키가 필요해요.");
     const { fromIndex, fromKey, toKey, images, imageLabels, context, instructions } = buildPinInput(pin);
 
-    const text = await ask(apiKey, instructions, context, images);
-    const html = renderMarkdown(text || "요약을 받지 못했어요.");
+    const { text, settings } = await ask(apiKey, instructions, context, images);
+    const answer = answerHtml(text);
+    const html = answer.html;
     savePinSummary(pin.id, {
-        html,
+        ...answer,   // html(키를 지운 글) + keyed(키가 붙은 글, 숫자 검사용)
         model: getModel(),
         at: Date.now(),
         from: fromIndex,
         to: pin.index,
         // 검산용 숫자 사실(AI 에게 보낸 데이터 전부에서) — 그릴 때마다 요약 글과 대조한다
         facts: collectFacts(context),
+        // 지시문 전문과 모델 설정(모델 이름 · 요청 매개변수) — 서술이 어떻게 만들어졌는지 서술과 함께 남긴다
+        prompt: { 지시문: instructions, ...settings },
         // 근거 — 요약이 무엇을 보고 쓰였는지 나중에 확인할 수 있게 함께 남긴다(이미지는 크기 때문에 개수만)
         evidence: {
-            구간: { 이전: timeLabel(fromKey), 현재: timeLabel(toKey) },
+            구간: { 이전: fromIndex < 0 ? EMPTY_START_LABEL : timeLabel(fromKey), 현재: timeLabel(toKey) },
             변경_요소_수: context.변경_요소_수,
+            수정이_아닌_갱신: context.수정이_아닌_갱신,
             층_카테고리별_변화: context.층_카테고리별_변화,
             물량_변화: context.물량_변화,
             수정_내용: context.수정_내용,
             변경_순서: context.변경_순서,
             구간_내부_과정: context.구간_내부_과정,
+            ...outsideEvidence(fromIndex, pin.index),   // AI 에 보낸 데이터가 아니다 — 세지 않은 수의 기록
             보낸_이미지: imageLabels,
-            구간_녹음: context.구간_녹음.map((r) => ({ 이름: r.이름, 전사됨: Boolean(r.전사) })),
+            구간_녹음: (context.구간_녹음 || []).map((r) => ({ 이름: r.이름, 전사됨: Boolean(r.전사) })),
         },
     });
     return html;
 }
 
-/** 저장된 요약의 숫자 검산 — 예전 요약(사실 없이 저장)은 근거 표로 대신한다 */
+/**
+ * 저장된 요약의 숫자 검산 — 키가 붙은 글이 있으면 그것으로(키로 대조), 없으면 키 없는 글로(낱말로 대조).
+ * 돌려주는 html 에는 키가 없다. 예전 요약(사실 없이 저장)은 근거 표로 대신한다.
+ */
 function checkSaved(saved) {
-    return checkNumbers(safeHtml(saved.html), saved.facts);
+    return checkNumbers(safeHtml(saved.keyed || saved.html), saved.facts);
 }
 
 /** 검산 기능 전에 만든 요약 — 검산 줄 대신 한 줄 안내 */
@@ -768,8 +868,8 @@ function legacyCheckNote(saved) {
         : "";
 }
 
-/** 저장된 근거를 사람이 읽을 수 있는 표로. */
-function evidenceHtml(ev) {
+/** 저장된 근거(와 지시문 · 모델 설정)를 사람이 읽을 수 있는 표로. */
+function evidenceHtml(ev, prompt) {
     if (!ev) return "";
     const rows = (ev.층_카테고리별_변화 || []).slice(0, 24);
     const qty = (ev.물량_변화 || []).slice(0, 14);
@@ -787,48 +887,86 @@ function evidenceHtml(ev) {
                     ${qty.map((q) => `<tr><td>${escapeHtml(q.카테고리)}</td><td>${escapeHtml(q.지표)}</td><td>${q.A}</td><td>${q.B}</td><td>${q.증감 > 0 ? "+" : ""}${q.증감}</td></tr>`).join("")}
                 </tbody></table>` : ""}
                 ${modsEvidenceHtml(ev.수정_내용)}
+                ${updatesEvidenceHtml(ev)}
                 ${sequenceEvidenceHtml(ev.변경_순서)}
                 <p class="aiblk__ev-line"><b>보낸 이미지</b> ${(ev.보낸_이미지 || []).map(escapeHtml).join(" · ")}</p>
                 ${(ev.구간_녹음 || []).length ? `<p class="aiblk__ev-line"><b>구간 녹음</b> ${ev.구간_녹음.map((r) => `${escapeHtml(r.이름)}${r.전사됨 ? " (전사 포함)" : " (전사 없음)"}`).join(" · ")}</p>` : ""}
+                ${promptEvidenceHtml(prompt)}
             </div>
         </details>`;
 }
 
-/** AI 에게 넘기는 수정 내용 — 문장은 코드가 만든다 */
+/** AI 에게 넘기는 수정 내용(순 단계가 입력 값 변경인 요소) — 문장은 코드가 만든다 */
 function modsContext(diff) {
     const m = summarizeModifications(diff, { exampleLimit: 14 });
     return {
-        수정된_요소: m.total,
-        값이_바뀐_요소: m.changed,
-        결과값만_바뀐_요소: m.derivedOnly,
-        함께_갱신된_요소: m.quiet,
+        수정된_요소: m.changed,
         항목별_요소_수: m.groups.slice(0, 12).map((g) => ({ 항목: g.group, 요소_수: g.count })),
         예시: m.lines,
     };
 }
 
 function sequenceEvidenceHtml(seq) {
-    const steps = seq?.단계 || [];
-    if (!steps.length) return "";
+    const rows = sequenceRows(seq);
+    if (!rows.length) return "";
+    const skipped = seq.생략한_묶음_수 ?? seq.생략한_작은_단계 ?? 0;   // 뒤는 예전 요약의 근거
+    const own = seq.자신의_단계_수;
     return `
-        <p class="aiblk__ev-line"><b>변경 순서</b> ${steps.length}단계${seq.생략한_작은_단계 ? ` (작은 단계 ${seq.생략한_작은_단계}개 생략)` : ""}</p>
-        <ol class="aiblk__ev-list">${steps.map((s) => `<li><b>${escapeHtml(s.시각)}</b> ${s.변경.map(escapeHtml).join(" · ")}</li>`).join("")}</ol>`;
+        <p class="aiblk__ev-line"><b>변경 순서</b> ${rows.length}묶음${skipped ? ` (작은 묶음 ${skipped}개 생략)` : ""}${own
+            ? ` · 설계자 자신의 단계 ${own.전체}${own.전파_가능 ? ` (전파 가능 ${own.전파_가능})` : ""}` : ""}</p>
+        <ol class="aiblk__ev-list">${rows.map((r) => `<li><b>${escapeHtml(r.시각)}</b> ${r.줄.map(escapeHtml).join(" · ")}</li>`).join("")}</ol>`;
 }
 
 function modsEvidenceHtml(mods) {
     if (!mods || !mods.수정된_요소) return "";
     const groups = (mods.항목별_요소_수 || []).slice(0, 12);
+    // 예전 요약은 새 버전이 생긴 요소를 모두 수정으로 세고 그 안을 나눠 적었다
+    const head = mods.값이_바뀐_요소 != null
+        ? `${mods.수정된_요소}개 중 값 변경 ${mods.값이_바뀐_요소} · 결과값만 ${mods.결과값만_바뀐_요소} · 함께 갱신 ${mods.함께_갱신된_요소}`
+        : `${mods.수정된_요소}개 (구간 양 끝에서 입력 값이 달라진 요소)`;
     return `
-        <p class="aiblk__ev-line"><b>수정</b> ${mods.수정된_요소}개 중 값 변경 ${mods.값이_바뀐_요소} · 결과값만 ${mods.결과값만_바뀐_요소} · 함께 갱신 ${mods.함께_갱신된_요소}</p>
+        <p class="aiblk__ev-line"><b>수정</b> ${head}</p>
         ${groups.length ? `<table class="aiblk__ev-tb tbl tbl--xs"><thead><tr><th>수정 항목</th><th>요소 수</th></tr></thead><tbody>
             ${groups.map((g) => `<tr><td>${escapeHtml(g.항목)}</td><td>${g.요소_수}</td></tr>`).join("")}
         </tbody></table>` : ""}
         ${(mods.예시 || []).length ? `<ul class="aiblk__ev-list">${mods.예시.slice(0, 8).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>` : ""}`;
 }
 
+/** 수정이 아닌 두 갱신 분류와 경로 수치(구간 전체 수 + 층 × 카테고리) */
+function updatesEvidenceHtml(ev) {
+    const u = ev.수정이_아닌_갱신, pr = ev.구간_내부_과정;
+    const rows = (pr?.층_카테고리별 || []).slice(0, 24);   // 예전 요약의 근거에는 없다
+    const out = ev.세지_않은_범위_밖_요소;                  // 있을 때만 저장된다(AI 에 보낸 데이터가 아니다)
+    return (u ?`<p class="aiblk__ev-line"><b>수정이 아닌 갱신</b> 결과값만 변경 ${u.결과값만_바뀐_요소 ?? 0} · 함께 갱신 ${u.함께_갱신된_요소 ?? 0}</p>` : "")
+        + (pr ? `<p class="aiblk__ev-line"><b>구간 안의 과정</b> 생성 후 삭제 ${pr.생성_후_삭제된_객체 ?? 0}${pr.변경_후_되돌린_객체 != null ? ` · 변경 후 되돌림 ${pr.변경_후_되돌린_객체}` : ""} · 추가 후 다시 수정 ${pr.추가_후_다시_수정된_객체 ?? 0}</p>` : "")
+        + (rows.length ? `<table class="aiblk__ev-tb tbl tbl--xs"><thead><tr><th>층</th><th>카테고리</th><th>생성 후 삭제</th><th>변경 후 되돌림</th><th>추가 후 다시 수정</th></tr></thead><tbody>
+            ${rows.map((r) => `<tr><td>${escapeHtml(r.층)}</td><td>${escapeHtml(r.카테고리)}</td><td>${r.생성_후_삭제된_객체}</td><td>${r.변경_후_되돌린_객체}</td><td>${r.추가_후_다시_수정된_객체}</td></tr>`).join("")}
+        </tbody></table>` : "")
+        + (out?.요소_수 ? `<p class="aiblk__ev-line"><b>세지 않은 것</b> 모델 범위 밖에서 만들고 지운 요소 ${out.요소_수}개 (자신의 단계 ${out.자신의_단계_수 ?? 0}) · AI 에 보내지 않음</p>` : "");
+}
+
+/** 서술과 함께 저장한 모델 설정과 지시문 전문 */
+function promptEvidenceHtml(prompt) {
+    if (!prompt) return "";
+    const t = prompt.매개변수?.temperature;
+    const bits = [
+        prompt.모델,
+        prompt.응답이_밝힌_모델 && prompt.응답이_밝힌_모델 !== prompt.모델 ? `응답 ${prompt.응답이_밝힌_모델}` : "",
+        t == null ? "temperature 없이 보냄" : `temperature ${t}`,
+        prompt.매개변수?.이미지_detail ? `이미지 detail ${prompt.매개변수.이미지_detail}` : "",
+    ].filter(Boolean);
+    return `
+        <p class="aiblk__ev-line"><b>모델 설정</b> ${bits.map(escapeHtml).join(" · ")}</p>
+        <details class="aiblk__ev-prompt disc disc--xs">
+            <summary>${icon("chevronRight", 12)}지시문 보기</summary>
+            <p class="aiblk__ev-pre">${escapeHtml(prompt.시스템_메시지 || "")}</p>
+            <p class="aiblk__ev-pre">${escapeHtml(prompt.지시문 || "")}</p>
+        </details>`;
+}
+
 /** 구간에 걸친 녹음. 이미 전사해 둔 것만 넣는다(음성을 새로 보내지 않는다). */
 function segmentRecordings(fromKey, toKey) {
-    const fromMs = keyMs(fromKey);
+    const fromMs = fromKey == null ? -Infinity : keyMs(fromKey);   // 첫 구간은 기록 시작부터
     const toMs = keyMs(toKey);
     return store.recordings
         .filter((r) => r.startMs > fromMs && r.startMs <= toMs)
@@ -896,7 +1034,7 @@ export function mountPinSummary(container, pin, { autoRun = false, onChange, com
             ${stale ? `<div class="aiblk__stale notice tone-mod">${icon("alert", 12)}그 사이에 핀이 바뀌었어요. 다시 요약하면 최신 구간으로 정리해요.</div>` : ""}
             <div class="aiblk__body">${sectionize(check.html)}</div>
             ${checkBarHtml(check.stats)}${legacyCheckNote(saved)}
-            ${evidenceHtml(saved.evidence)}
+            ${evidenceHtml(saved.evidence, saved.prompt)}
             ${rateSlot()}
             <div class="aiblk__foot">
                 <span class="aiblk__model">${escapeHtml(saved.model || "")} · ${fmtWhen(saved.at)}</span>
@@ -1022,39 +1160,44 @@ export async function summarizeBriefing(from, to) {
     const rw = segmentRework(from, to);
     const newPins = store.pins.filter((p) => p.index > from && p.index <= to);
 
+    const recordings = getSendTranscripts() ? segmentRecordings(fromKey, toKey) : null;
     const context = {
         기간: { 이전: timeLabel(fromKey), 현재: timeLabel(toKey), 기록_시점_수: to - from },
         새_핀: newPins.map((p) => ({ ...pinSummary(p), 시각: timeLabel(store.timeKeys[p.index]) })),
         변경_요소_수: { 추가: diff.addedIds.length, 삭제: diff.deletedIds.length, 수정: diff.modified.after.length },
+        수정이_아닌_갱신: updatesContext(diff),
         층_카테고리별_변화: levelRows(diff),
         물량_변화: quantityDeltas(fromKey, toKey),
         수정_내용: modsContext(diff),
-        작업_흐름: { 편집: rw.edits, 되돌린_요소: rw.reverted, 확정된_요소: rw.settled, 실작업_분: Math.round(rw.activeMs / 60000) },
-        변경_순서: changeSequence(from, to, 16),
-        구간_녹음: segmentRecordings(fromKey, toKey),
+        작업_흐름: { 편집: rw.edits, 확정된_요소: rw.settled, 실작업_분: Math.round(rw.activeMs / 60000) },
+        구간_내부_과정: segmentProcess(from, to),
+        변경_순서: changeSequence(from, to, 16),   // 짧은 브리핑만 큰 묶음 16개로 줄인다(Commit 해석은 전부 보낸다)
+        ...(recordings ? { 구간_녹음: recordings } : {}),
         메모_없는_핀: newPins.filter((p) => !p.note).map((p) => p.title),
     };
 
     const instructions = [
         "아래는 사용자가 마지막으로 확인한 뒤(이전) 지금(현재)까지 BIM 모델에서 바뀐 내용입니다. 오랜만에 돌아온 사람에게 브리핑하듯 쓰세요.",
         "숫자는 이미 계산된 값입니다. 그대로 인용하고, 직접 계산하거나 없는 수치를 지어내지 마세요.",
-        "'수정_내용'의 '함께 갱신'은 값이 바뀌지 않은 갱신이니 고친 것으로 세지 마세요. 이미지는 없으니 공간은 수치로만 판단하세요.",
+        RULE_UPDATES,
+        RULE_SEQUENCE,
+        "이미지는 없으니 공간은 수치로만 판단하세요.",
         "",
         decisionFormat({
             relation: "'변경_순서'(시간 순)와 새 핀",
             observed: "새로 생긴 것 · 없어진 것 · 고친 것을 층·카테고리 기준으로 큰 것부터 2~4줄.",
             spatial: "층 · 카테고리 분포와 물량 증감으로 어느 층에 작업이 몰렸고 무엇이 늘거나 줄었는지 1~2줄.",
-            inferred: "해석은 1~2개. 마지막에 '확인해 볼 것:' 뒤에 되돌린 요소가 많은 곳, 메모 없는 핀, 녹음과 어긋나 보이는 곳을 한 줄로 쓰세요(없으면 생략).",
+            inferred: `해석은 1~2개. 마지막에 '확인해 볼 것:' 뒤에 '구간_내부_과정'에서 생성 후 삭제되거나 변경 후 되돌린 객체가 많은 곳, 메모 없는 핀${recordings ? ", 녹음과 어긋나 보이는 곳" : ""}을 한 줄로 쓰세요(없으면 생략).`,
             length: "오랜만에 돌아온 사람이 읽기 좋게 짧게, 전체 10문장을 넘기지 마세요.",
         }),
     ].join("\n");
 
-    const text = await ask(apiKey, instructions, context, []);
-    const html = renderMarkdown(text || "요약을 받지 못했어요.");
+    const { text, settings } = await ask(apiKey, instructions, context, []);
     const data = {
-        html,
+        ...answerHtml(text),
         model: getModel(),
         at: Date.now(),
+        prompt: { 지시문: instructions, ...settings },
         fromKey,
         toKey,
         facts: collectFacts(context),
@@ -1063,10 +1206,13 @@ export async function summarizeBriefing(from, to) {
             변경_요소_수: context.변경_요소_수,
             층_카테고리별_변화: context.층_카테고리별_변화,
             물량_변화: context.물량_변화,
+            수정이_아닌_갱신: context.수정이_아닌_갱신,
             수정_내용: context.수정_내용,
             변경_순서: context.변경_순서,
+            구간_내부_과정: context.구간_내부_과정,
+            ...outsideEvidence(from, to),
             보낸_이미지: [],
-            구간_녹음: context.구간_녹음.map((r) => ({ 이름: r.이름, 전사됨: Boolean(r.전사) })),
+            구간_녹음: (context.구간_녹음 || []).map((r) => ({ 이름: r.이름, 전사됨: Boolean(r.전사) })),
         },
     };
     try { localStorage.setItem(BRIEFING_STORAGE, JSON.stringify(data)); } catch { }
@@ -1079,11 +1225,11 @@ export function mountBriefingSummary(container, from, to, { autoRun = false } = 
     const saved = getBriefingSummary(from, to);
 
     if (saved && !autoRun) {
-        const check = checkNumbers(safeHtml(saved.html), saved.facts);
+        const check = checkSaved(saved);
         paint(container, `
             <div class="aiblk__body">${sectionize(check.html)}</div>
             ${checkBarHtml(check.stats)}
-            ${evidenceHtml(saved.evidence)}
+            ${evidenceHtml(saved.evidence, saved.prompt)}
             ${rateSlot()}
             <div class="aiblk__foot">
                 <span class="aiblk__model">${escapeHtml(saved.model || "")} · ${fmtWhen(saved.at)}</span>
@@ -1176,7 +1322,7 @@ export async function summarizeProject() {
 
     const lastIndex = store.timeKeys.length - 1;
     const segments = store.pins.map((pin, i) => {
-        const from = i > 0 ? store.pins[i - 1].index : 0;
+        const { from } = pinRange(pin);   // 첫 구간은 빈 모델에서 시작한다
         const diff = diffBetween(from, pin.index);
         const saved = getPinSummary(pin.id);
         return {
@@ -1195,7 +1341,7 @@ export async function summarizeProject() {
             주요_층_카테고리: levelRows(diff)
                 .sort((a, b) => (b.추가 + b.삭제 + b.수정) - (a.추가 + a.삭제 + a.수정))
                 .slice(0, 4),
-            구간_녹음: segmentRecordings(store.timeKeys[from], store.timeKeys[pin.index]).map((r) => r.이름),
+            구간_녹음: segmentRecordings(from < 0 ? null : store.timeKeys[from], store.timeKeys[pin.index]).map((r) => r.이름),
             이미_만든_요약: saved ? plainText(saved.html).slice(0, 500) : null,
         };
     });
@@ -1222,6 +1368,7 @@ export async function summarizeProject() {
         "아래는 한 BIM 프로젝트의 작업 이력입니다. 핀(작업 시점 표시)마다 그 구간에서 실제로 바뀐 요소 수와 층·카테고리가 계산되어 있습니다.",
         "숫자는 이미 계산된 값입니다. 그대로 인용하고, 직접 계산하거나 없는 수치를 지어내지 마세요.",
         "이미지는 첫 시점과 마지막 시점의 정면 두 장입니다. 전체 결과를 설명할 때만 참고하세요.",
+        "'수정'은 구간 양 끝을 비교해 입력 값이 달라진 요소만 센 것입니다(결과값만 달라졌거나 차이 없이 갱신된 요소는 세지 않았습니다).",
         "",
         decisionFormat({
             relation: "'구간들'의 순서(핀 순서)",
@@ -1232,12 +1379,12 @@ export async function summarizeProject() {
         }),
     ].join("\n");
 
-    const text = await ask(apiKey, instructions, context, images);
-    const html = renderMarkdown(text || "요약을 받지 못했어요.");
+    const { text, settings } = await ask(apiKey, instructions, context, images);
     const data = {
-        html,
+        ...answerHtml(text),
         model: getModel(),
         at: Date.now(),
+        prompt: { 지시문: instructions, ...settings },
         pinCount: store.pins.length,
         lastPinId: store.pins[store.pins.length - 1]?.id || null,
         facts: collectFacts(context),
@@ -1253,7 +1400,7 @@ export function mountProjectSummary(container, { autoRun = false, onChange } = {
 
     if (saved && !autoRun) {
         const stale = saved.pinCount !== store.pins.length || saved.lastPinId !== (store.pins[store.pins.length - 1]?.id || null);
-        const check = checkNumbers(safeHtml(saved.html), saved.facts);
+        const check = checkSaved(saved);
         paint(container, `
             ${stale ? `<div class="aiblk__stale notice tone-mod">${icon("alert", 12)}그 뒤로 핀이 바뀌었어요. 다시 쓰면 지금 이력으로 정리해요.</div>` : ""}
             <div class="aiblk__body">${sectionize(check.html)}</div>
@@ -1440,7 +1587,9 @@ export function initAiSummary() {
             await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
             store.compareViewer?.prepareCapture?.();
             const lo = Math.min(s.beforeIndex, s.afterIndex), hi = Math.max(s.beforeIndex, s.afterIndex);
-            const plans = planShots(s.beforeIndex, s.afterIndex, s.diff);
+            // 분할 비교의 차이(필터가 걸린 것)를 핀 요약과 같은 뜻으로 다시 나눈다 — 수정은 입력 값이 달라진 요소만
+            const diff = classifyDiff(s.diff, lo, hi);
+            const plans = planShots(s.beforeIndex, s.afterIndex, diff);
             const images = [
                 shrink(store.compareViewer?.renderer?.domElement),
                 shrink(store.viewer?.renderer?.domElement),
@@ -1458,18 +1607,19 @@ export function initAiSummary() {
                         .map(pinSummary),
                 },
                 변경_요소_수: {
-                    추가: s.diff.addedIds.length,
-                    삭제: s.diff.deletedIds.length,
-                    수정: s.diff.modified.after.length,
-                    유지: s.diff.unchangedIds?.length ?? 0,
+                    추가: diff.addedIds.length,
+                    삭제: diff.deletedIds.length,
+                    수정: diff.modified.after.length,
+                    유지: diff.unchangedIds?.length ?? 0,
                 },
-                층_카테고리별_변화: levelRows(s.diff),
+                수정이_아닌_갱신: updatesContext(diff),
+                층_카테고리별_변화: levelRows(diff),
                 물량_변화: quantityDeltas(s.beforeKey, s.afterKey),
-                수정_내용: modsContext(s.diff),
+                수정_내용: modsContext(diff),
                 변경_요소_예시: {
-                    추가: sampleElements(s.diff.addedIds),
-                    삭제: sampleElements(s.diff.deletedIds),
-                    수정: sampleElements(s.diff.modified.after),
+                    추가: sampleElements(diff.addedIds),
+                    삭제: sampleElements(diff.deletedIds),
+                    수정: sampleElements(diff.modified.after),
                 },
                 변경_순서: changeSequence(lo, hi),
                 적용된_필터: s.filters,
@@ -1482,7 +1632,8 @@ export function initAiSummary() {
                 "아래는 BIM 모델의 두 시점(A: 이전, B: 현재)을 비교한 결과입니다.",
                 "숫자(물량·개수·층별 변화)는 이미 계산된 값입니다. 그대로 인용하고, 직접 계산하거나 없는 수치를 지어내지 마세요.",
                 `이미지는 순서대로 ${imageLabels.join(", ")} 입니다. 형태·배치·공간 관계를 읽는 데만 쓰고, 이미지에서 수량을 세지 마세요.`,
-                "'수정_내용'의 '함께 갱신'은 값이 바뀌지 않은 갱신이니 고친 것으로 세지 마세요.",
+                RULE_UPDATES,
+                RULE_SEQUENCE + " 층 · 카테고리 필터가 걸려 있으면 '변경_순서'는 필터와 상관없이 구간 전체의 순서입니다.",
                 "",
                 decisionFormat({
                     relation: "'변경_순서'(시간 순)",
@@ -1494,7 +1645,7 @@ export function initAiSummary() {
                 }),
             ].join("\n");
 
-            const text = await ask(apiKey, instructions, context, images);
+            const { text } = await ask(apiKey, instructions, context, images);
             const check = checkNumbers(renderMarkdown(text || "요약을 받지 못했어요."), collectFacts(context));
             output.innerHTML = `<div class="ai-output__body">${sectionize(check.html)}</div>${checkBarHtml(check.stats)}`;
             wireCheckToggle(output);

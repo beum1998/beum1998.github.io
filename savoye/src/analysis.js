@@ -2,19 +2,20 @@
 // 재작업 분석 화면 (이력 화면의 "분석" 보기)
 //
 //   · 지표 타일   생성 · 최종 · 폐기율 · 헛수고 편집 · 요소당 평균 수정
-//   · 핀 구간별 편집   구간마다 "남은 편집 / 되돌린 편집" 가로 누적 막대 (+ 표로 보기)
+//   · 핀 구간별 편집   구간마다 "남은 편집 / 생성 후 삭제된 요소의 편집" 가로 누적 막대 (+ 표로 보기)
 //   · 요소 수명선      요소마다 존재한 기간(막대)과 수정 시점(점), 핀 위치(세로선)
 //                      층 × 카테고리로 묶어 접어 두고, 묶음 머리에는 편집 밀도 띠
 //   · 층 × 카테고리 표 · 가장 많이 고친 요소 표
 //
-// 색은 "강조" 형식 하나만 쓴다 — 이야기의 주인공(버린 것/되돌린 것)은 강조색,
+// 색은 "강조" 형식 하나만 쓴다 — 이야기의 주인공(버린 것 · 만들었다 지운 것)은 강조색,
 // 나머지는 회색. 범례 · 값 라벨 · 표가 함께 있어 색만으로 읽지 않게 한다.
-// 숫자는 rework.js 가 계산한 값만 쓴다.
+// 숫자는 rework.js(전체 이력)와 segment.js(핀 구간)가 계산한 값만 쓴다.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { store, catInfo, escapeHtml, formatKey, showTip, hideTip } from "./store.js";
 import { icon } from "./icons.js";
-import { analyzeRework, segmentRework, elementsCsv, segmentsCsv } from "./rework.js";
+import { analyzeRework, elementsCsv } from "./rework.js";
+import { segmentRework, segmentsCsv, pinRange } from "./segment.js";
 import { download, stamp, projectName } from "./rating.js";
 import { fmtDuration, shortLevel } from "./pinView.js";
 
@@ -37,7 +38,7 @@ export function renderAnalysis(host, { onJump } = {}) {
     const R = analyzeRework();
     const t = R.totals;
     const segs = store.pins.map((pin, i) => {
-        const from = i > 0 ? store.pins[i - 1].index : 0;
+        const { from } = pinRange(pin);   // 첫 구간은 빈 모델에서 시작한다
         return { pin, order: i + 1, s: segmentRework(from, pin.index) };
     });
 
@@ -66,7 +67,8 @@ export function renderAnalysis(host, { onJump } = {}) {
             <header class="anl-card__head">
                 <div>
                     <h3>핀 구간별 편집</h3>
-                    <p>구간 안에서 요소를 추가·수정한 횟수. 강조색은 손댔지만 그 핀 시점에는 남지 않은 요소에 들어간 편집이에요.</p>
+                    <p>구간 안에 기록된 추가·새 버전 횟수. 강조색은 그 구간에서 만들었다가 그 핀 시점 전에 지운 요소(생성 후 삭제)에 들어간 편집이에요.
+                       건물에서 멀리 떨어진 곳(모델 범위 밖)에 만들었다가 지운 요소는 세지 않고, 그 수는 표의 "범위 밖" 칸에 따로 적어요.</p>
                 </div>
                 <button class="btn btn--ghost btn--xs${state.segTable ? " is-on" : ""}" type="button" data-anl="seg-table">${icon("list", 13)}${state.segTable ? "막대로 보기" : "표로 보기"}</button>
             </header>
@@ -135,7 +137,7 @@ function segBars(segs) {
     return `
         <div class="anl-legend anl-legend--tight">
             <span><i class="lg-bar lg-bar--kept"></i>남은 편집</span>
-            <span><i class="lg-bar lg-bar--gone"></i>되돌린 편집</span>
+            <span><i class="lg-bar lg-bar--gone"></i>생성 후 삭제된 요소의 편집</span>
         </div>
         <div class="sbars">
         ${segs.map(({ pin, order, s }) => {
@@ -147,9 +149,9 @@ function segBars(segs) {
                 <div class="sbar__track">
                     <span class="sbar__bars" style="--w:${widthPct.toFixed(2)}">
                         ${s.keptEdits ? `<i class="sbar__fill sbar__fill--kept${s.revertedEdits ? "" : " is-end"}" style="flex-grow:${s.keptEdits}" tabindex="0" role="img" aria-label="${order}번 구간 남은 편집 ${s.keptEdits}회" data-tip="kept"></i>` : ""}
-                        ${s.revertedEdits ? `<i class="sbar__fill sbar__fill--gone is-end" style="flex-grow:${s.revertedEdits}" tabindex="0" role="img" aria-label="${order}번 구간 되돌린 편집 ${s.revertedEdits}회" data-tip="gone"></i>` : ""}
+                        ${s.revertedEdits ? `<i class="sbar__fill sbar__fill--gone is-end" style="flex-grow:${s.revertedEdits}" tabindex="0" role="img" aria-label="${order}번 구간 생성 후 삭제된 요소의 편집 ${s.revertedEdits}회" data-tip="gone"></i>` : ""}
                     </span>
-                    <span class="sbar__value">${s.edits.toLocaleString()}${s.revertedEdits ? ` <em>되돌림 ${share}%</em>` : ""}</span>
+                    <span class="sbar__value">${s.edits.toLocaleString()}${s.revertedEdits ? ` <em>생성 후 삭제 ${share}%</em>` : ""}</span>
                 </div>
             </div>`;
         }).join("")}
@@ -159,12 +161,14 @@ function segBars(segs) {
 function segTable(segs) {
     return `
         <div class="anl-table-wrap"><table class="anl-table tbl">
-            <thead><tr><th>#</th><th>핀</th><th>걸린 시간</th><th>실작업</th><th>편집</th><th>되돌린 편집</th><th>되돌린 요소</th><th>확정</th></tr></thead>
+            <thead><tr><th>#</th><th>핀</th><th>걸린 시간</th><th>실작업</th><th>편집</th><th>생성 후 삭제된 요소의 편집</th><th>생성 후 삭제</th><th>변경 후 되돌림</th><th>추가 후 다시 수정</th><th>확정</th>
+                <th title="모델 범위 밖에서 만들었다가 지운 요소 — 앞의 어느 칸에도 세지 않았어요(요소 수 · 그 요소의 편집)">범위 밖 (세지 않음)</th></tr></thead>
             <tbody>${segs.map(({ pin, order, s }) => `
                 <tr><td>${order}</td><td class="t">${escapeHtml(pin.title)}</td>
                 <td>${fmtDuration(s.spanMs)}</td><td>${fmtDuration(s.activeMs)}</td>
                 <td class="n">${s.edits.toLocaleString()}</td><td class="n">${s.revertedEdits.toLocaleString()}</td>
-                <td class="n">${s.reverted}</td><td class="n">${s.settled}</td></tr>`).join("")}
+                <td class="n">${s.reverted}</td><td class="n">${s.restored}</td><td class="n">${s.addedRevised}</td><td class="n">${s.settled}</td>
+                <td class="n">${s.outside ? `${s.outside} · 편집 ${s.outsideEdits}` : "0"}</td></tr>`).join("")}
             </tbody>
         </table></div>`;
 }
@@ -357,12 +361,12 @@ function wire(host, R, onJump) {
         if (fill) {
             const seg = Number(fill.closest(".sbar").dataset.seg);
             const pin = store.pins[seg];
-            const from = seg > 0 ? store.pins[seg - 1].index : 0;
-            const s = segmentRework(from, pin.index);
+            const s = segmentRework(pinRange(pin).from, pin.index);
             const kind = fill.dataset.tip;
-            return `<div class="tip-pin"><b>${kind === "gone" ? s.revertedEdits.toLocaleString() : s.keptEdits.toLocaleString()}회 · ${kind === "gone" ? "되돌린 편집" : "남은 편집"}</b>
+            return `<div class="tip-pin"><b>${kind === "gone" ? s.revertedEdits.toLocaleString() : s.keptEdits.toLocaleString()}회 · ${kind === "gone" ? "생성 후 삭제된 요소의 편집" : "남은 편집"}</b>
                 <span>#${seg + 1} ${escapeHtml(pin.title)}</span>
-                <span>편집 ${s.edits.toLocaleString()} · 되돌린 요소 ${s.reverted} · 확정 ${s.settled}</span></div>`;
+                <span>편집 ${s.edits.toLocaleString()} · 생성 후 삭제 ${s.reverted} · 변경 후 되돌림 ${s.restored} · 확정 ${s.settled}</span>
+                ${s.outside ? `<span>모델 범위 밖에서 만들고 지운 요소 ${s.outside}개(편집 ${s.outsideEdits}회)는 세지 않음</span>` : ""}</div>`;
         }
         return null;
     };

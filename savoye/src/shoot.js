@@ -7,6 +7,7 @@
 //   · 이력 화면의 썸네일: 한 방향, 모든 핀이 같은 각도
 //   · AI 요약: 동 · 서 · 남 · 북 · 위 다섯 방향
 //   · AI 요약: 바뀐 층의 변경 전 · 후 평면(층 높이에서 수평으로 잘라 위에서 본 것)
+//   · AI 요약: 구간 안에서 만들고 지운 요소를 같은 틀에 그린 평면(그 시점에 없는 요소를 더해 찍는다)
 //
 // 좌표 변환(meshLoader): three.x = revit.x, three.y = revit.z, three.z = −revit.y
 // → Revit의 북(+Y)은 three의 −Z 쪽이다. 방위 이름은 프로젝트 북(Project North) 기준.
@@ -169,6 +170,10 @@ const PLAN_REACH = new Set(["Floors", "Stairs", "Railings"]);   // 아래에서 
 const PLAN_MERGE = 0.2;        // 가장 큰 층고의 20% 보다 가까운 층 이름은 한 층으로
 const PLAN_WIDTH = 560;
 const PLAN_FLOOR = new THREE.Color(0xf4f5f7);
+// 바탕으로 물러나는 요소의 색(dim) — 벽 단면이 밝은 바닥 위에서 읽히되, 칠한 요소보다 앞서 보이지 않을 만큼
+const PLAN_DIM = new THREE.Color(0xc4c9d1);
+const PLAN_DIM_STRENGTH = 0.88;
+const PLAN_EXTRA_STRENGTH = 0.85;   // 더해 그린 요소는 보통의 강조(TINT_STRENGTH)보다 진하게
 
 let planCache = null;
 let orthoCam = null;
@@ -259,6 +264,38 @@ function inPlan(g, lv) {
     return b.max.y > lv.base + storey * PLAN_ABOVE;
 }
 
+// 모델 범위 안의 요소인지 — 로그에는 모델에서 수천 단위 떨어진 요소 버전이 섞여 있다(modelSphere 의 설명).
+// 그런 요소를 평면에 넣으면 틀이 그만큼 벌어져 건물이 점처럼 찍힌다
+const nearCenter = new THREE.Vector3();
+function nearModel(g) {
+    const whole = modelSphere();
+    return !whole || boxOf(g).getCenter(nearCenter).distanceTo(whole.center) <= Math.max(whole.radius * 2, 8);
+}
+
+/**
+ * 요소 버전(ID)이 모델 범위 안에 있는지 — true(안) · false(밖) · null(판정할 수 없음: 형상이 없거나 빈 상자).
+ * 범위는 nearModel 그대로다: 상자 중심이 modelSphere 중심에서 max(반경 × 2, 8) 이내.
+ * 평면에 그릴지(inLevelPlan · captureLevelPlans)와 구간 계산(segment.js 의 "모델 범위 밖에서 만들고 지운 요소")이
+ * 이 판정 하나를 쓴다 — 평면에서 빠지는 요소와 수치에서 빠지는 요소가 서로 다른 기준으로 갈리지 않게.
+ * modelSphere 는 프로젝트를 연 뒤 처음 쓸 때 한 번 계산해 두므로(마지막 시점 + 그때의 핀 시점 요소) 같은 로그 · 같은
+ * 핀에서는 늘 같은 판정이다.
+ */
+export function modelRangeOf(id) {
+    const g = store.meshDict[id];
+    if (!g?.isObject3D || boxOf(g).isEmpty()) return null;
+    return nearModel(g);
+}
+
+/**
+ * 요소(버전 ID)가 그 평면 층의 그림에 실제로 그려지는지 — 그 층의 자르는 높이에 걸리고 모델 범위 안에 있다.
+ * captureLevelPlans 가 extra 로 받은 요소를 그릴지 정하는 것과 같은 판정이다(그려지는 수를 미리 셀 때 쓴다).
+ */
+export function inLevelPlan(id, levelKey) {
+    const g = store.meshDict[id];
+    const lv = planLevels().find((l) => l.key === levelKey);
+    return Boolean(g && lv && inPlan(g, lv) && nearModel(g));
+}
+
 function planMembers(index, lv) {
     const out = [];
     for (const id of store.timeLog[store.timeKeys[index]]?.Elements || []) {
@@ -289,7 +326,10 @@ export function planLevelOf(id) {
  * 한 평면 층을 여러 시점에서 같은 틀로 찍는다.
  * @param {object} opts
  * @param {string} opts.levelKey   planLevels() 의 key
- * @param {{ index: number, tint?: Map<string, THREE.Color> }[]} opts.shots
+ * @param {{ index: number, tint?: Map<string, THREE.Color>, extra?: string[], dim?: boolean }[]} opts.shots
+ *   extra  그 시점에는 없지만 함께 그릴 요소 버전 ID(구간 안에서 만들고 지운 요소의 마지막 버전). 이 층 평면에 드는 것만
+ *          그리고, tint 의 색을 진하게 칠해 같은 자리의 다른 요소보다 앞에 보이게 한다
+ *   dim    그 시점의 요소를 회색 바탕으로 물린다(extra 만 눈에 띄게)
  * @returns {string[]} dataURL 배열 (shots 와 같은 순서, 틀을 못 잡으면 빈 배열)
  */
 export function captureLevelPlans({ levelKey, shots, quality = 0.82, width = PLAN_WIDTH }) {
@@ -297,11 +337,9 @@ export function captureLevelPlans({ levelKey, shots, quality = 0.82, width = PLA
     const lv = planLevels().find((l) => l.key === levelKey);
     if (!lv) return [];
 
-    const whole = modelSphere();
-    const limit = whole ? Math.max(whole.radius * 2, 8) : Infinity;
-    const center = new THREE.Vector3();
-    const members = shots.map((s) => planMembers(s.index, lv)
-        .filter((g) => !whole || boxOf(g).getCenter(center).distanceTo(whole.center) <= limit));
+    const extras = shots.map((s) => new Set((s.extra || [])
+        .map((id) => store.meshDict[id]).filter((g) => g && inPlan(g, lv) && nearModel(g))));
+    const members = shots.map((s, k) => [...new Set([...planMembers(s.index, lv).filter(nearModel), ...extras[k]])]);
     const box = new THREE.Box3();
     for (const list of members) for (const g of list) box.union(boxOf(g));
     if (box.isEmpty()) return [];
@@ -343,11 +381,25 @@ export function captureLevelPlans({ levelKey, shots, quality = 0.82, width = PLA
         });
         // 바닥판은 밝게 — 어두운 바닥 위에서는 벽 단면이 묻힌다. 바뀐 바닥판도 옅게만 칠한다
         const isFloor = (g) => g.userData?.Common?.ElementCategory === "Floors";
+        const extra = extras[k];
         for (const g of set) if (isFloor(g)) paint(g, PLAN_FLOOR, 0.8);
+        // 바탕으로 물리는 평면: 더해 그린 요소 말고는 회색으로(바닥판은 이미 밝다)
+        if (shot.dim) for (const g of set) if (!extra.has(g) && !isFloor(g)) paint(g, PLAN_DIM, PLAN_DIM_STRENGTH);
         for (const [id, color] of shot.tint || []) {
             const g = store.meshDict[id];
-            if (g && set.has(g)) paint(g, color, isFloor(g) ? 0.3 : TINT_STRENGTH);
+            if (!g || !set.has(g)) continue;
+            paint(g, color, extra.has(g) ? (isFloor(g) ? 0.5 : PLAN_EXTRA_STRENGTH) : isFloor(g) ? 0.3 : TINT_STRENGTH);
         }
+        // 더해 그린 요소는 같은 자리에 다시 그려진 요소와 겹칠 수 있다 — 깊이를 조금 당겨 앞에 보이게 한다
+        const lifted = [];
+        for (const g of extra) g.traverse((m) => {
+            if (!m.isMesh) return;
+            const mat = m.material;
+            lifted.push([mat, mat.polygonOffset, mat.polygonOffsetFactor, mat.polygonOffsetUnits]);
+            mat.polygonOffset = true;
+            mat.polygonOffsetFactor = -2;
+            mat.polygonOffsetUnits = -2;
+        });
         try {
             r.render(store.viewer.scene, orthoCam);
             out.push(r.domElement.toDataURL("image/jpeg", quality));
@@ -355,6 +407,7 @@ export function captureLevelPlans({ levelKey, shots, quality = 0.82, width = PLA
             console.warn("[shoot] 평면 렌더 실패:", e);
             out.push(null);
         }
+        for (const [mat, on, factor, units] of lifted.reverse()) Object.assign(mat, { polygonOffset: on, polygonOffsetFactor: factor, polygonOffsetUnits: units });
         for (const [material, color] of tinted.reverse()) material.color.copy(color);   // 두 번 칠한 바닥판도 원래 색으로
     });
 

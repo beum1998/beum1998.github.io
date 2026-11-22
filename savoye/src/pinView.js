@@ -5,16 +5,18 @@
 // "핀 하나에 대해 무엇을 말할지"를 한 곳에 모았다. 화면마다 밀도만 다르다.
 //
 //   1단 (항상)  단계 · 시각 · 제목 · 한 줄 변화 요약   예) +56 −1 ~0 · 1층 벽 15 · 기둥 11
-//   2단 (펼침)  작업 시간 · 편집 · 되돌림 · 확정 · 녹음 + 층 × 카테고리 칩
+//   2단 (펼침)  작업 시간 · 편집 · 생성 후 삭제 · 확정 · 녹음 + 층 × 카테고리 칩
 //   3단 (요청)  AI 요약 → 근거 → 평가            (aiSummary.mountPinSummary)
 //
-// 숫자는 diffBetween(핀 사이 순변화)과 segmentRework(구간 안의 편집 흐름)에서만 온다.
+// 숫자는 segment.js 한곳에서 온다 — 순변화(추가 · 삭제 · 수정)와 구간 안의 편집 흐름.
+// "수정"(~)은 구간 양 끝에서 입력 값이 달라진 요소만 센다. 결과값만 변경 · 함께 갱신 · 변경 후 되돌림은
+// 수정 내용 머리에 따로 적는다. 첫 핀의 구간은 빈 모델에서 시작한다.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { store, catInfo, levelOf, escapeHtml, onProjectReset } from "./store.js";
 import { icon } from "./icons.js";
 import { diffBetween } from "./aiSummary.js";
-import { segmentRework } from "./rework.js";
+import { segmentRework, pinRange } from "./segment.js";
 import { summarizeModifications, catsText } from "./changeDiff.js";
 
 const PATTERNS = 6;
@@ -25,8 +27,7 @@ const thumbCache = new Map();
 
 /** 핀 하나에 대한 사실들(캐시). */
 export function pinFacts(pin) {
-    const prev = prevOf(pin);
-    const from = prev ? prev.index : 0;
+    const { prev, from } = pinRange(pin);
     const key = `${pin.id}|${from}|${pin.index}|${store.timeKeys.length}|${store.recordings.length}`;
     const hit = factsCache.get(pin.id);
     if (hit && hit.key === key) return hit.facts;
@@ -74,12 +75,6 @@ export function rangeFacts(from, to) {
         recs: store.recordings.filter((r) => r.startMs > fromMs && r.startMs <= toMs),
         gapMs: toMs - fromMs,
     };
-}
-
-function prevOf(pin) {
-    let hit = null;
-    for (const p of store.pins) if (p.index < pin.index) hit = p;
-    return hit;
 }
 
 function weight(r) { return r.added + r.deleted + r.modified; }
@@ -134,9 +129,11 @@ export function statsHtml(f) {
     const items = [
         stat("clock", fmtDuration(f.gapMs), r.activeMs ? `실작업 ${fmtDuration(r.activeMs)}` : "", "이전 핀부터 걸린 시간 · 10분 넘게 비운 시간을 뺀 실작업 시간"),
         stat("edit", `편집 ${r.edits.toLocaleString()}`, r.del ? `삭제 ${r.del}` : "", "구간 안에서 요소를 추가·수정한 횟수"),
-        stat("refresh", `되돌림 ${r.reverted}`, r.revertedEdits ? `편집 ${r.revertedEdits}` : "", "구간 안에서 손댔지만 이 핀 시점에는 남지 않은 요소", r.reverted ? "warn" : ""),
+        stat("refresh", `생성 후 삭제 ${r.reverted}`, r.revertedEdits ? `편집 ${r.revertedEdits}` : "", "구간 시작에는 없었고, 구간 안에서 만들었다가 이 핀 시점 전에 지운 요소", r.reverted ? "warn" : ""),
         stat("check", `확정 ${r.settled}`, "", "마지막 편집이 이 구간이고, 끝까지 그대로 남은 요소"),
     ];
+    // 모델 범위 밖에서 만들고 지운 요소 — 위의 편집 · 생성 후 삭제에 세지 않았다는 것을 한 번 보여 준다
+    if (r.outside) items.push(stat("eyeOff", `범위 밖 ${r.outside}`, "세지 않음", `건물에서 멀리 떨어진 곳(모델 범위 밖)에 만들었다가 지운 요소 ${r.outside}개 — 편집 ${r.outsideEdits}회와 함께 위 수치 · 변경 순서 · AI 해석에 넣지 않아요`));
     if (f.recs.length) items.push(stat("mic", `녹음 ${f.recs.length}`, "", "이 구간에 녹음된 파일"));
     return `<div class="pinx-stats">${items.join("")}</div>`;
 }
@@ -162,10 +159,10 @@ export function modsHtml(f, { interactive = false, openGroup = null, limit = 6 }
         <div class="pinx-mods card card--flat">
             <div class="pinx-mods__head">
                 <span>수정 내용</span>
-                <em>${m.total}개 중 값 변경 ${m.changed}${m.derivedOnly ? ` · 결과값만 ${m.derivedOnly}` : ""}${m.quiet ? ` · 함께 갱신 ${m.quiet}` : ""}</em>
+                <em title="수정은 구간 양 끝에서 입력 값이 달라진 요소. 결과값만 변경 · 함께 갱신 · 변경 후 되돌림은 수정으로 세지 않아요">수정 ${m.changed}${m.derivedOnly ? ` · 결과값만 ${m.derivedOnly}` : ""}${m.quiet ? ` · 함께 갱신 ${m.quiet}` : ""}${m.restored ? ` · 변경 후 되돌림 ${m.restored}` : ""}</em>
             </div>
             ${groups.length ? `<div class="pinx-mods__chips">${groups.map(chip).join("")}${rest > 0 ? `<span class="mchip chip chip--sm chip--more">외 ${rest}</span>` : ""}</div>`
-                : `<p class="pinx-mods__none">값이 바뀐 수정은 없어요 — 함께 갱신 · 결과값 변화만 있어요.</p>`}
+                : `<p class="pinx-mods__none">입력 값이 달라진 수정은 없어요 — 결과값 변화 · 함께 갱신 · 되돌린 변경만 있어요.</p>`}
             ${open ? `<ul class="pinx-mods__examples">${open.patterns.slice(0, PATTERNS).map((p) => `
                 <li><button type="button" data-act="mod-element" data-base="${escapeHtml(p.bases[0])}" title="${p.count > 1 ? `같은 변화 ${p.count}개 중 첫 요소의 이력 보기` : "요소 이력 보기"}">
                     <span class="pinx-mods__el">${escapeHtml(p.count > 1 ? catsText(p.cats) : elementShort(p.ids[0]))}</span>

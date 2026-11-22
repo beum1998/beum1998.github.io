@@ -3,9 +3,9 @@
 //
 // Design Commit(핀) 하나를 골라, AI 가 받은 입력과 내놓은 해석을 한 화면에 모은다.
 //   · Design Commit 기록 — 구간의 시작 · 종료 시점, 이 Commit 과 앞선 Commit 의 Commit Message
-//   · 구간별 형상 정보 — 3D(남측)와 바뀐 층의 평면(변경 전 / 변경 후), 변경 순서,
-//                        구간 안에서 생성 후 삭제된 객체 · 추가 후 다시 수정된 객체
-//   · 구간별 물량 정보 — 변경 요소 수와 카테고리별 물량 차이
+//   · 구간별 형상 정보 — 3D(남측)와 바뀐 층의 평면(변경 전 / 변경 후 / 생성 후 삭제된 요소), 변경 순서(설계자 자신의 단계),
+//                        구간 안에서 생성 후 삭제된 객체 · 변경 후 되돌린 객체 · 추가 후 다시 수정된 객체
+//   · 구간별 물량 정보 — 변경 요소 수(추가 · 삭제 · 수정), 수정이 아닌 갱신, 카테고리별 물량 차이
 //   · AI 해석 결과 — Observed Change / Spatial Impact / Inferred Design Decision + 숫자 검산
 // 이미지와 데이터는 buildPinInput 이 만든 것 그대로라, AI 에 보낸 것과 같다.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -13,6 +13,7 @@
 import { store, on, emit, formatKey, escapeHtml, onProjectReset } from "./store.js";
 import { icon } from "./icons.js";
 import { buildPinInput, mountPinSummary, getPinSummary } from "./aiSummary.js";
+import { pinRange, sequenceRows } from "./segment.js";
 import { planLevels } from "./shoot.js";
 import { EASE_IN, EASE_OUT, reduced } from "./motion.js";
 
@@ -69,8 +70,7 @@ export function initCommitView() {
     });
 
     function inputOf(pin) {
-        const prevIndex = [...store.pins].reverse().find((p) => p.index < pin.index)?.index ?? 0;
-        const key = `${pin.id}|${prevIndex}|${pin.index}`;
+        const key = `${pin.id}|${pinRange(pin).from}|${pin.index}`;
         if (!cache.has(key)) cache.set(key, buildPinInput(pin));
         return cache.get(key);
     }
@@ -135,21 +135,28 @@ export function initCommitView() {
             </div>`;
     }
 
-    // ── 구간별 형상 정보: 모델과 층별 평면(열 = 3D + 층(높이 순), 행 = 변경 전 / 변경 후) + 변경 순서 ──
+    // ── 구간별 형상 정보: 모델과 층별 평면(열 = 3D + 층(높이 순), 행 = 변경 전 / 변경 후 / 생성 후 삭제) + 변경 순서 ──
+    // 셋째 행은 구간 안에서 만들고 지운 요소를 그린 평면 — AI 에 보낸 것이 있을 때만 그린다
     function shapeHtml(pin, input) {
         const order = planLevels().map((l) => l.key);
         const levels = [...input.plans.levels].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
         const cols = [
-            { head: "3D 모델", sub: "남측", before: input.beforeShot[0], after: input.views[0] },
-            ...levels.map((l) => ({ head: `${l.name} 평면`, sub: l.role, before: l.before, after: l.after })),
+            { head: "3D 모델", sub: "남측", before: input.beforeShot[0], after: input.views[0], trial: null, noTrial: "평면에만 그림" },
+            ...levels.map((l) => ({
+                head: `${l.name} 평면`, sub: l.role, before: l.before, after: l.after, trial: l.trial, noTrial: "이 층에는 없음",
+                // 인접 층은 변경 후만 보낸다. 변경 층인데 비었으면 구간 양 끝 모두 그 층에 요소가 없는 것
+                none: l.role === "변경 층" ? "이 층에 요소 없음" : undefined,
+            })),
         ];
-        const cell = (src, alt) => src
+        const anyTrial = cols.some((c) => c.trial);
+        const cell = (src, alt, none = "인접 층은 변경 후만 보냄") => src
             ? `<figure class="cv-shot"><img src="${src}" alt="${escapeHtml(alt)}"></figure>`
-            : `<figure class="cv-shot cv-shot--none"><span>인접 층은 변경 후만 보냄</span></figure>`;
+            : `<figure class="cv-shot cv-shot--none"><span>${none}</span></figure>`;
         return `
             <div class="sec-head"><h3>구간별 형상 정보</h3>
                 <span class="cv-legend">
                     <span class="tag tone-add">추가</span><span class="tag tone-mod">수정</span><span class="tag tone-del">삭제 (변경 전 평면)</span>
+                    ${anyTrial ? `<span class="tag tone-pin" title="구간 안에서 만들었다가 지운 요소 — 양 끝 평면에는 없어 따로 그려요. 회색은 변경 후의 배치">생성 후 삭제 (셋째 행)</span>` : ""}
                     <em>평면은 층고 40% 높이의 수평 단면, 북쪽이 위</em>
                 </span>
             </div>
@@ -157,29 +164,35 @@ export function initCommitView() {
                 <span></span>
                 ${cols.map((c) => `<div class="cv-shots__head"><b>${escapeHtml(c.head)}</b><span>${escapeHtml(c.sub)}</span></div>`).join("")}
                 <div class="cv-shots__row">변경 전</div>
-                ${cols.map((c) => cell(c.before, `${c.head} 변경 전`)).join("")}
+                ${cols.map((c) => cell(c.before, `${c.head} 변경 전`, c.none)).join("")}
                 <div class="cv-shots__row">변경 후</div>
-                ${cols.map((c) => cell(c.after, `${c.head} 변경 후`)).join("")}
+                ${cols.map((c) => cell(c.after, `${c.head} 변경 후`, c.none)).join("")}
+                ${anyTrial ? `<div class="cv-shots__row">생성 후 삭제</div>
+                ${cols.map((c) => cell(c.trial, `${c.head} 생성 후 삭제된 요소`, c.noTrial)).join("")}` : ""}
             </div>
             ${processHtml(pin, input)}`;
     }
 
     function processHtml(pin, input) {
         const c = input.context;
-        const seq = c.변경_순서?.단계 || [];
-        const skipped = c.변경_순서?.생략한_작은_단계 || 0;
+        const seq = sequenceRows(c.변경_순서);
+        const skipped = c.변경_순서?.생략한_묶음_수 || 0;
+        const own = c.변경_순서?.자신의_단계_수 || {};
         const proc = c.구간_내부_과정 || {};
+        // 모델 범위 밖에서 만들고 지운 요소 — 계산에서 뺐고 AI 에도 보내지 않았다. 여기에는 그 수만 한 줄로 적는다
+        const out = input.account?.outside;
         return `
             <div class="cv-proc">
                 <div class="card cv-proc__counts">
                     <div class="metric"><span>생성 후 삭제된 객체</span><b>${(proc.생성_후_삭제된_객체 ?? 0).toLocaleString()}</b></div>
+                    <div class="metric"><span>변경 후 되돌린 객체</span><b>${(proc.변경_후_되돌린_객체 ?? 0).toLocaleString()}</b></div>
                     <div class="metric"><span>추가 후 다시 수정된 객체</span><b>${(proc.추가_후_다시_수정된_객체 ?? 0).toLocaleString()}</b></div>
-                    <div class="metric"><span>값이 바뀐 수정</span><b>${(c.수정_내용?.값이_바뀐_요소 ?? 0).toLocaleString()}</b></div>
+                    ${out?.elements ? `<p class="cv__hint">모델 범위 밖에서 만들고 지운 요소 ${out.elements.toLocaleString()}개(단계 ${out.steps.toLocaleString()})는 세지 않았고 AI 에 보내지 않았어요.</p>` : ""}
                 </div>
                 <div class="card cv-proc__seq">
-                    <div class="cv-info__title">변경 순서<span>${seq.length}단계${skipped ? `, 작은 단계 ${skipped}개 생략` : ""}</span></div>
+                    <div class="cv-info__title">변경 순서<span>${seq.length}묶음${skipped ? `, 작은 묶음 ${skipped}개 생략` : ""} · 설계자 자신의 단계 ${(own.전체 ?? 0).toLocaleString()}${own.전파_가능 ? ` (전파 가능 ${own.전파_가능.toLocaleString()})` : ""}</span></div>
                     <ol class="cv-seq">
-                        ${seq.map((st) => `<li><time>${escapeHtml(st.시각)}</time><span>${st.변경.map(escapeHtml).join("<br>")}</span></li>`).join("")}
+                        ${seq.map((st) => `<li><time>${escapeHtml(st.시각)}</time><span>${st.줄.map(escapeHtml).join("<br>")}</span></li>`).join("")}
                     </ol>
                 </div>
             </div>`;
@@ -192,6 +205,7 @@ export function initCommitView() {
         const fmt = (v) => typeof v === "number" ? v.toLocaleString(undefined, { maximumFractionDigits: 3 }) : escapeHtml(String(v ?? ""));
         const sign = (v) => (v > 0 ? "+" : "") + fmt(v);
         const qty = (c.물량_변화 || []).slice(0, 12);
+        const u = c.수정이_아닌_갱신 || {};
         return `
             <div class="sec-head"><h3>구간별 물량 정보</h3><span class="cv__hint">객체 상태의 변화로 코드가 계산한 값</span></div>
             <div class="cv-qty">
@@ -199,6 +213,7 @@ export function initCommitView() {
                     <div class="metric tone-add"><span>추가</span><b>${fmt(n.추가)}</b></div>
                     <div class="metric tone-del"><span>삭제</span><b>${fmt(n.삭제)}</b></div>
                     <div class="metric tone-mod"><span>수정</span><b>${fmt(n.수정)}</b></div>
+                    <p class="cv__hint">수정이 아닌 갱신: 결과값만 변경 ${fmt(u.결과값만_바뀐_요소 ?? 0)} · 함께 갱신 ${fmt(u.함께_갱신된_요소 ?? 0)}</p>
                 </div>
                 <div class="card cv-qty__table">
                     ${qty.length ? `<table class="tbl tbl--xs">
